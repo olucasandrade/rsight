@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-18T18:41:22.463Z"
+last_updated: "2026-03-18T18:53:43.925Z"
 progress:
   total_phases: 1
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 5
   completed_plans: 5
 ---
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 1 of 3 (Search Core)
-Plan: 4 of 5 in current phase
-Status: In progress
-Last activity: 2026-03-18 — Completed 01-search-core Plan 04 (Unified async search API with debounce)
+Plan: 5 of 5 in current phase — PHASE COMPLETE
+Status: Phase 1 complete, ready for Phase 2
+Last activity: 2026-03-18 — Completed 01-search-core Plan 05 (Performance validation — criterion benchmark + smoke test)
 
-Progress: [████░░░░░░] 40%
+Progress: [██████████] 100% (Phase 1)
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Progress: [████░░░░░░] 40%
 *Updated after each plan completion*
 | Phase 01-search-core P03 | 2min | 1 tasks | 2 files |
 | Phase 01-search-core P04 | 2min | 2 tasks | 3 files |
+| Phase 01-search-core P05 | 10min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Recent decisions affecting current work:
 - [01-02]: search_names takes mpsc::Sender (not returning Receiver) — caller controls channel lifecycle; Plan 04 must spawn in tokio::task::spawn_blocking
 - [01-04]: spawn_blocking used for both name and content search since both are synchronous; tx clone pattern drops original tx to close channel when both tasks finish
 - [01-04]: debounced_search accepts Sender (not returning Receiver) so TUI controls the result channel lifecycle; delay_ms is a parameter for testability
+- [Phase 01-search-core]: criterion async_tokio feature added but bench loops call synchronous functions directly — avoids runtime overhead
+- [Phase 01-search-core]: < 1s requirement scoped to TUI first-result streaming latency, not total CLI wall time
 
 ### Pending Todos
 
@@ -81,5 +84,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 01-search-core-04-PLAN.md (Unified async search API with debounce)
+Stopped at: Completed 01-search-core-05-PLAN.md (Performance validation — Phase 1 complete)
 Resume file: None

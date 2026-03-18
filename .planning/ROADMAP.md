@@ -12,7 +12,7 @@ rsight ships in three phases. Phase 1 builds the search engine core — file/fol
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Search Core** - Scan $HOME for files, folders, and file contents with results under 1 second
+- [x] **Phase 1: Search Core** - Scan $HOME for files, folders, and file contents with results under 1 second (completed 2026-03-18)
 - [ ] **Phase 2: TUI Shell** - Interactive terminal interface with search bar, tabbed results, and keyboard navigation
 - [ ] **Phase 3: AI Conversations + Open Actions** - AI conversation search and result-opening behaviors for all result types
 
@@ -59,6 +59,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Search Core | 4/5 | In Progress|  |
+| 1. Search Core | 5/5 | Complete   | 2026-03-18 |
 | 2. TUI Shell | 0/TBD | Not started | - |
 | 3. AI Conversations + Open Actions | 0/TBD | Not started | - |
