@@ -15,7 +15,61 @@ const EXCLUDED_DIRS: &[&str] = &["node_modules", ".git", "target", "vendor", "bu
 /// - `query`: The search string. Empty query produces no results.
 /// - `tx`: mpsc sender; caller drops receiver to cancel (backpressure handled by bounded channel)
 pub fn search_names(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) {
-    todo!("implement search_names")
+    if query.is_empty() {
+        return;
+    }
+
+    let query_owned = query.to_string();
+
+    WalkBuilder::new(root)
+        .hidden(false)          // traverse hidden directories (SRCH-04 requirement)
+        .git_ignore(false)      // do not skip files just because they're gitignored
+        .filter_entry(|entry| {
+            // Skip excluded directory names at any depth
+            if entry.file_type().map(|ft| ft.is_dir()).unwrap_or(false) {
+                let name = entry.file_name().to_string_lossy();
+                !EXCLUDED_DIRS.contains(&name.as_ref())
+            } else {
+                true
+            }
+        })
+        .build_parallel()
+        .run(|| {
+            let tx = tx.clone();
+            let matcher = SkimMatcherV2::default();
+            let query = query_owned.clone();
+            Box::new(move |result| {
+                use ignore::WalkState;
+                let entry = match result {
+                    Ok(e) => e,
+                    Err(_) => return WalkState::Continue,
+                };
+                // Skip the root itself
+                if entry.depth() == 0 {
+                    return WalkState::Continue;
+                }
+                let path = entry.path();
+                let name = path.file_name()
+                    .map(|n| n.to_string_lossy().into_owned())
+                    .unwrap_or_default();
+                if name.is_empty() {
+                    return WalkState::Continue;
+                }
+                if let Some(score) = matcher.fuzzy_match(&name, &query) {
+                    let path_str = path.to_string_lossy().into_owned();
+                    let result = if entry.file_type().map(|ft| ft.is_dir()).unwrap_or(false) {
+                        SearchResult::Folder { path: path_str, name, score: Some(score) }
+                    } else {
+                        SearchResult::File { path: path_str, name, score: Some(score) }
+                    };
+                    // If receiver dropped (cancelled), stop walking
+                    if tx.blocking_send(result).is_err() {
+                        return WalkState::Quit;
+                    }
+                }
+                WalkState::Continue
+            })
+        });
 }
 
 #[cfg(test)]
