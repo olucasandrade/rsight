@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-18T19:18:48.304Z"
+last_updated: "2026-03-18T19:24:16.665Z"
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 10
-  completed_plans: 6
+  completed_plans: 8
 ---
 
 # Project State
@@ -23,9 +23,9 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 2 of 3 (TUI Shell)
-Plan: 2 of 5 in current phase — Plan 02 complete
-Status: Phase 2 in progress (2/5 plans done)
-Last activity: 2026-03-18 — Completed 02-tui-shell Plan 02 (TUI layout and rendering)
+Plan: 3 of 5 in current phase — Plan 03 complete
+Status: Phase 2 in progress (3/5 plans done)
+Last activity: 2026-03-18 — Completed 02-tui-shell Plan 03 (Event loop and search wiring)
 
 Progress: [██████████] 100% (Phase 1) | [████      ] 40% (Phase 2)
 
@@ -52,6 +52,7 @@ Progress: [██████████] 100% (Phase 1) | [████      ]
 | Phase 01-search-core P05 | 10min | 2 tasks | 2 files |
 | Phase 02-tui-shell P01 | 2min | 2 tasks | 3 files |
 | Phase 02-tui-shell P02 | 2min | 2 tasks | 4 files |
+| Phase 02-tui-shell P03 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,8 @@ Recent decisions affecting current work:
 - [Phase 02-tui-shell]: AppState owns both ends of the mpsc channel (4096 cap) — no external channel management by callers
 - [Phase 02-tui-shell]: draw_ui is the sole rendering entry point; format_result produces plain String — styled spans with match highlights deferred to Plan 04
 - [Phase 02-tui-shell]: ListState constructed locally each frame from app.selected_index — no persistent widget state
+- [Phase 02-tui-shell]: crate::search::debounced_search used in event_loop.rs (inside crate, not rsight:: external consumer)
+- [Phase 02-tui-shell]: NavDir enum avoids collision with ratatui::layout::Direction; KeyEventKind::Press filter prevents duplicate key events
 
 ### Pending Todos
 
@@ -90,5 +93,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 02-tui-shell-02-PLAN.md (TUI layout and rendering)
+Stopped at: Completed 02-tui-shell-03-PLAN.md (Event loop and search wiring)
 Resume file: None
