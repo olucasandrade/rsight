@@ -41,11 +41,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 5 plans
 
 Plans:
-- [ ] 02-tui-shell-01-PLAN.md — ratatui/crossterm dependencies + AppState and TabKind types
-- [ ] 02-tui-shell-02-PLAN.md — TUI layout and rendering (search bar, tab bar, results list, status bar)
-- [ ] 02-tui-shell-03-PLAN.md — Event loop and search wiring (keyboard input, debounced_search, result drain)
-- [ ] 02-tui-shell-04-PLAN.md — Match highlighting and open/copy actions (Enter, Ctrl+C)
-- [ ] 02-tui-shell-05-PLAN.md — Visual verification checkpoint
+- [x] 02-tui-shell-01-PLAN.md — ratatui/crossterm dependencies + AppState and TabKind types
+- [x] 02-tui-shell-02-PLAN.md — TUI layout and rendering (search bar, tab bar, results list, status bar)
+- [x] 02-tui-shell-03-PLAN.md — Event loop and search wiring (keyboard input, debounced_search, result drain)
+- [x] 02-tui-shell-04-PLAN.md — Match highlighting and open/copy actions (Enter, Ctrl+C)
+- [x] 02-tui-shell-05-PLAN.md — Visual verification checkpoint (2 gaps found — gap closure plan needed)
 
 ### Phase 3: AI Conversations + Open Actions
 **Goal**: Users can search Claude Code and Cursor conversation history and open any result type in its native application
@@ -66,6 +66,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Search Core | 5/5 | Complete   | 2026-03-18 |
-| 2. TUI Shell | 4/5 | In Progress|  |
+| 1. Search Core | 5/5 | Complete | 2026-03-18 |
+| 2. TUI Shell | 5/5 plans done | Gap closure required (2 gaps) | - |
 | 3. AI Conversations + Open Actions | 0/TBD | Not started | - |

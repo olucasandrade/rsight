@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-18T19:24:16.665Z"
+last_updated: "2026-03-18T19:36:43Z"
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 2 of 3 (TUI Shell)
-Plan: 4 of 5 in current phase — Plan 04 complete
-Status: Phase 2 in progress (4/5 plans done)
-Last activity: 2026-03-18 — Completed 02-tui-shell Plan 04 (Match highlighting and open actions)
+Plan: 5 of 5 in current phase — Plan 05 complete (with gaps)
+Status: Phase 2 plans complete — gap closure required before Phase 3
+Last activity: 2026-03-18 — Completed 02-tui-shell Plan 05 (Visual verification — 2 gaps found)
 
-Progress: [██████████] 100% (Phase 1) | [████████  ] 80% (Phase 2)
+Progress: [██████████] 100% (Phase 1) | [██████████] 100% plans done (Phase 2, gap closure pending)
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [██████████] 100% (Phase 1) | [██████�
 | Phase 02-tui-shell P02 | 2min | 2 tasks | 4 files |
 | Phase 02-tui-shell P03 | 2min | 2 tasks | 3 files |
 | Phase 02-tui-shell P04 | 2min | 2 tasks | 6 files |
+| Phase 02-tui-shell P05 | 10min | 1 task (checkpoint) | 0 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,8 @@ Recent decisions affecting current work:
 - [Phase 02-tui-shell]: highlight_spans uses case-insensitive greedy substring match (first occurrence) — lightweight, no fuzzy overhead
 - [Phase 02-tui-shell]: make_list_item returns ListItem<'static> via owned Strings to avoid lifetime propagation into ratatui widgets
 - [Phase 02-tui-shell]: clone result before open_result to resolve immutable/mutable borrow conflict on AppState
+- [02-tui-shell-05 gap]: TUI-02 partial — content search takes >30s across $HOME; file/folder name search is fast; gap closure needed
+- [02-tui-shell-05 gap]: Tab reset-on-query-change decision REVERSED by user testing — active tab must persist on query change
 
 ### Pending Todos
 
@@ -93,9 +96,11 @@ None yet.
 ### Blockers/Concerns
 
 - Cursor conversation format (~/.cursor/) is TBD — needs investigation before Phase 3
+- **[GAP-01] Content search performance**: Contents tab search takes >30s — must be fixed before Phase 2 is complete (TUI-02 partially unsatisfied)
+- **[GAP-02] Tab persistence regression**: Active tab resets to Files on every query change — UX regression, must be fixed (event_loop.rs query-change handler)
 
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 02-tui-shell-04-PLAN.md (Match highlighting and open actions)
+Stopped at: Completed 02-tui-shell-05-PLAN.md (Visual verification — 2 gaps found, gap closure plan needed)
 Resume file: None
