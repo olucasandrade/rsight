@@ -4,6 +4,7 @@ pub mod content_search;
 pub mod search;
 pub mod app;
 pub mod ui;
+pub mod event_loop;
 
 pub use types::SearchResult;
 pub use name_search::search_names;
