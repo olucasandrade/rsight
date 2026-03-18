@@ -88,6 +88,10 @@ Recent decisions affecting current work:
 - [Phase 02-tui-shell]: clone result before open_result to resolve immutable/mutable borrow conflict on AppState
 - [02-tui-shell-05 gap]: TUI-02 partial — content search takes >30s across $HOME; file/folder name search is fast; gap closure needed
 - [02-tui-shell-05 gap]: Tab reset-on-query-change decision REVERSED by user testing — active tab must persist on query change
+- [02-gap closure]: EXCLUDED_DIRS expanded to include .cargo, .rustup, Library, Applications, .Trash, Movies, Music, Pictures — eliminates the dominant $HOME cost centres for content search
+- [02-gap closure]: WalkBuilder switched from build() to build_parallel() — directory traversal is now multi-threaded, matching rayon parallelism already used for file reads
+- [02-gap closure]: MAX_CONTENT_RESULTS=100 cap enforced atomically in search_contents — consistent with AppState 100-result-per-tab cap; prevents unbounded streaming on large trees
+- [02-gap closure]: active_tab is no longer reset on query-change in event_loop.rs; tab transitions are now exclusively explicit (Tab/Shift+Tab)
 
 ### Pending Todos
 
@@ -96,11 +100,11 @@ None yet.
 ### Blockers/Concerns
 
 - Cursor conversation format (~/.cursor/) is TBD — needs investigation before Phase 3
-- **[GAP-01] Content search performance**: Contents tab search takes >30s — must be fixed before Phase 2 is complete (TUI-02 partially unsatisfied)
-- **[GAP-02] Tab persistence regression**: Active tab resets to Files on every query change — UX regression, must be fixed (event_loop.rs query-change handler)
+- ~~**[GAP-01] Content search performance**~~: CLOSED — exclusion list expanded, build_parallel() adopted, 100-result cap added (commit 1cc9ec9)
+- ~~**[GAP-02] Tab persistence regression**~~: CLOSED — active_tab reset removed from query-change handler (commit 7f60d7d)
 
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 02-tui-shell-05-PLAN.md (Visual verification — 2 gaps found, gap closure plan needed)
+Stopped at: Completed 02-gap closure — GAP-01 (content search perf) and GAP-02 (tab persistence) both fixed and committed
 Resume file: None
