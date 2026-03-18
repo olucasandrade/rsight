@@ -1,14 +1,26 @@
 use ignore::WalkBuilder;
 use rayon::prelude::*;
 use std::fs;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 use tokio::sync::mpsc;
 use crate::types::SearchResult;
 
-const EXCLUDED_DIRS: &[&str] = &["node_modules", ".git", "target", "vendor", "build"];
+const EXCLUDED_DIRS: &[&str] = &[
+    // Development build artifacts and dependency caches
+    "node_modules", ".git", "target", "vendor", "build",
+    // Rust toolchain caches (can be gigabytes)
+    ".cargo", ".rustup",
+    // macOS system and media directories (large, rarely contain searchable text)
+    "Library", "Applications", ".Trash",
+    "Movies", "Music", "Pictures",
+];
 /// Maximum file size to search in bytes (1 MB).
 const MAX_FILE_SIZE: u64 = 1_024 * 1_024;
 /// Number of bytes to inspect for binary detection.
 const BINARY_CHECK_BYTES: usize = 8_192;
+/// Maximum number of content matches to collect before stopping.
+const MAX_CONTENT_RESULTS: usize = 100;
 
 /// Returns true if the byte slice looks like binary (contains a null byte).
 fn is_binary(buf: &[u8]) -> bool {
@@ -17,16 +29,19 @@ fn is_binary(buf: &[u8]) -> bool {
 
 /// Search the contents of all text files under `root` for lines containing `query`.
 /// Results are sent to `tx` as matches are found.
+/// Stops after collecting MAX_CONTENT_RESULTS matches.
 pub fn search_contents(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) {
     if query.is_empty() {
         return;
     }
 
-    // Collect file paths first, then search in parallel with rayon.
-    // WalkBuilder handles traversal; rayon handles parallel file reads.
+    // Collect file paths using parallel WalkBuilder traversal.
+    // build_parallel() distributes directory traversal across threads, making
+    // the walk itself faster on large trees (e.g. $HOME with many subdirs).
     let mut file_paths: Vec<std::path::PathBuf> = Vec::new();
+    let (path_tx, path_rx) = std::sync::mpsc::channel();
 
-    for entry in WalkBuilder::new(root)
+    WalkBuilder::new(root)
         .hidden(false)       // include hidden dirs (SRCH-04)
         .git_ignore(false)   // do not skip gitignored files
         .filter_entry(|e| {
@@ -37,23 +52,38 @@ pub fn search_contents(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) 
                 true
             }
         })
-        .build()
-        .flatten()
-    {
-        if entry.file_type().map(|ft| ft.is_file()).unwrap_or(false) {
-            // Apply size filter eagerly
-            if let Ok(meta) = entry.metadata() {
-                if meta.len() <= MAX_FILE_SIZE {
-                    file_paths.push(entry.into_path());
+        .build_parallel()
+        .run(|| {
+            let path_tx = path_tx.clone();
+            Box::new(move |entry_result| {
+                use ignore::WalkState;
+                let Ok(entry) = entry_result else { return WalkState::Continue };
+                if entry.file_type().map(|ft| ft.is_file()).unwrap_or(false) {
+                    if let Ok(meta) = entry.metadata() {
+                        if meta.len() <= MAX_FILE_SIZE {
+                            let _ = path_tx.send(entry.into_path());
+                        }
+                    }
                 }
-            }
-        }
+                WalkState::Continue
+            })
+        });
+    // Drop the original sender so the receiver closes when all walk threads finish
+    drop(path_tx);
+    while let Ok(p) = path_rx.recv() {
+        file_paths.push(p);
     }
+
+    // Shared counter for result cap. Checked atomically across rayon threads.
+    let match_count = Arc::new(AtomicUsize::new(0));
 
     // Parallel content search with rayon
     file_paths.par_iter().for_each(|path| {
         if tx.is_closed() {
             return; // receiver dropped — cancelled
+        }
+        if match_count.load(Ordering::Relaxed) >= MAX_CONTENT_RESULTS {
+            return; // cap reached
         }
         let Ok(bytes) = fs::read(path) else { return };
         // Binary detection: check first BINARY_CHECK_BYTES
@@ -65,6 +95,9 @@ pub fn search_contents(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) 
         let path_str = path.to_string_lossy().into_owned();
         for (idx, line) in bytes.split(|&b| b == b'\n').enumerate() {
             if tx.is_closed() { return; }
+            if match_count.load(Ordering::Relaxed) >= MAX_CONTENT_RESULTS {
+                return; // cap reached mid-file
+            }
             // Try to decode as UTF-8; skip lines that aren't valid UTF-8
             let Ok(line_str) = std::str::from_utf8(line) else { continue };
             if line_str.contains(query) {
@@ -73,7 +106,9 @@ pub fn search_contents(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) 
                     line_number: (idx + 1) as u64,
                     line: line_str.trim_end().to_string(),
                 };
-                let _ = tx.blocking_send(result);
+                if tx.blocking_send(result).is_ok() {
+                    match_count.fetch_add(1, Ordering::Relaxed);
+                }
             }
         }
     });
