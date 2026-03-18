@@ -9,6 +9,7 @@ use ratatui::{backend::CrosstermBackend, Terminal};
 use crate::app::{AppState, TabKind};
 use crate::ui::draw_ui;
 use crate::search::debounced_search;
+use crate::actions::{open_result, copy_to_clipboard, result_path};
 
 const SEARCH_DELAY_MS: u64 = 150;
 const TICK_MS: u64 = 16; // ~60fps polling interval
@@ -116,7 +117,33 @@ async fn handle_key(app: &mut AppState, code: KeyCode, modifiers: KeyModifiers, 
             }
         }
 
-        // Ignore everything else (Enter and Ctrl+C handled in Plan 04)
+        // Open selected result
+        (KeyCode::Enter, _) => {
+            if !app.active_tab.is_enabled() {
+                // Disabled AI tab: show status message
+                app.status_message = Some("AI search coming in a future update".to_string());
+            } else {
+                let results = app.active_results();
+                if !results.is_empty() {
+                    let idx = app.selected_index.min(results.len() - 1);
+                    let result = results[idx].clone();
+                    open_result(&result);
+                }
+            }
+        }
+
+        // Copy path to clipboard
+        (KeyCode::Char('c'), KeyModifiers::CONTROL) => {
+            let results = app.active_results();
+            if !results.is_empty() {
+                let idx = app.selected_index.min(results.len() - 1);
+                let path = result_path(&results[idx]).to_string();
+                copy_to_clipboard(&path);
+                app.status_message = Some(format!("Copied: {}", path));
+            }
+        }
+
+        // Ignore everything else
         _ => {}
     }
 }
