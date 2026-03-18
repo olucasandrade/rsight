@@ -59,6 +59,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Search Core | 3/5 | In Progress|  |
+| 1. Search Core | 4/5 | In Progress|  |
 | 2. TUI Shell | 0/TBD | Not started | - |
 | 3. AI Conversations + Open Actions | 0/TBD | Not started | - |

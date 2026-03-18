@@ -8,7 +8,7 @@ progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 1 of 3 (Search Core)
-Plan: 3 of 5 in current phase
+Plan: 4 of 5 in current phase
 Status: In progress
-Last activity: 2026-03-18 — Completed 01-search-core Plan 03 (Content search — full-text with binary detection and size guard)
+Last activity: 2026-03-18 — Completed 01-search-core Plan 04 (Unified async search API with debounce)
 
-Progress: [███░░░░░░░] 30%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
@@ -40,14 +40,15 @@ Progress: [███░░░░░░░] 30%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-search-core | 1 / 5 | 2 min | 2 min |
+| 01-search-core | 4 / 5 | 8 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2 min)
-- Trend: —
+- Last 5 plans: 01-01 (2 min), 01-02 (2 min), 01-03 (2 min), 01-04 (2 min)
+- Trend: stable
 
 *Updated after each plan completion*
 | Phase 01-search-core P03 | 2min | 1 tasks | 2 files |
+| Phase 01-search-core P04 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Recent decisions affecting current work:
 - [01-02]: hidden(false) and git_ignore(false) on WalkBuilder to traverse all files including dotfiles (SRCH-04)
 - [01-02]: filter_entry prunes entire subtrees at excluded directories for efficiency
 - [01-02]: search_names takes mpsc::Sender (not returning Receiver) — caller controls channel lifecycle; Plan 04 must spawn in tokio::task::spawn_blocking
+- [01-04]: spawn_blocking used for both name and content search since both are synchronous; tx clone pattern drops original tx to close channel when both tasks finish
+- [01-04]: debounced_search accepts Sender (not returning Receiver) so TUI controls the result channel lifecycle; delay_ms is a parameter for testability
 
 ### Pending Todos
 
@@ -78,5 +81,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 01-search-core-03-PLAN.md (Content search — full-text with binary detection and size guard)
+Stopped at: Completed 01-search-core-04-PLAN.md (Unified async search API with debounce)
 Resume file: None
