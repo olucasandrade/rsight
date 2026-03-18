@@ -1,18 +1,11 @@
 pub mod types;
-pub use types::SearchResult;
-
-pub mod content_search;
-pub use content_search::search_contents;
-
 pub mod name_search;
+pub mod content_search;
+pub mod search;
+
+pub use types::SearchResult;
 pub use name_search::search_names;
-
-use tokio::sync::mpsc;
-
-/// Stub search function — implemented in Plans 02-04.
-/// Returns an mpsc receiver that will yield SearchResult items.
-pub async fn search(_root: &str, _query: &str) -> mpsc::Receiver<SearchResult> {
-    let (tx, rx) = mpsc::channel(1024);
-    drop(tx); // immediately closed — stub produces no results
-    rx
-}
+pub use content_search::search_contents;
+pub use search::search;
+pub use search::debounced_search;
+pub use search::SearchHandle;
