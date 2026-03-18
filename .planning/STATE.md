@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-18T20:06:15.286Z"
+last_updated: "2026-03-18T20:09:38Z"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 14
-  completed_plans: 11
+  completed_plans: 12
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 3 of 3 (AI Conversations & Open Actions)
-Plan: 1 of 4 in current phase — Plan 01 complete
-Status: Phase 3 in progress — data layer (AiConversation type + parsers) complete
-Last activity: 2026-03-18 — Completed 03-ai-conversations-open-actions Plan 01 (AiConversation type + Claude + Cursor parsers)
+Plan: 2 of 4 in current phase — Plan 02 complete
+Status: Phase 3 in progress — AppState wired, AI Conversations tab enabled, search pipeline live
+Last activity: 2026-03-18 — Completed 03-ai-conversations-open-actions Plan 02 (AppState + search pipeline wiring)
 
-Progress: [██████████] 100% (Phase 1) | [██████████] 100% (Phase 2) | [██░░░░░░░░] 25% (Phase 3, 1/4 plans)
+Progress: [██████████] 100% (Phase 1) | [██████████] 100% (Phase 2) | [████░░░░░░] 50% (Phase 3, 2/4 plans)
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [██████████] 100% (Phase 1) | [██████�
 | Phase 02-tui-shell P04 | 2min | 2 tasks | 6 files |
 | Phase 02-tui-shell P05 | 10min | 1 task (checkpoint) | 0 files |
 | Phase 03-ai-conversations-open-actions P01 | 5min | 3 tasks | 9 files |
+| Phase 03-ai-conversations-open-actions P02 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,9 @@ Recent decisions affecting current work:
 - [Phase 03-ai-conversations-open-actions]: serde_json added to Cargo.toml — was absent despite plan assuming it existed
 - [Phase 03-ai-conversations-open-actions]: rusqlite bundled feature — avoids system SQLite dependency
 - [Phase 03-ai-conversations-open-actions]: ai_search parsers use std::sync::mpsc not tokio::sync::mpsc — parsers are sync, not inside tokio runtime
+- [03-02]: search_ai_conversations bridges std::sync::mpsc (parsers) to tokio::sync::mpsc (search pipeline) via internal channel and blocking_send forwarding loop
+- [03-02]: AI Conversations tab enabled globally as of Phase 3 — is_enabled() returns true unconditionally
+- [03-02]: search() now spawns three concurrent blocking tasks (name, content, AI conversations) — channel closes when all three finish
 
 ### Pending Todos
 
@@ -110,5 +114,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 03-ai-conversations-open-actions Plan 01 (AiConversation type + Claude Code + Cursor parsers)
+Stopped at: Completed 03-ai-conversations-open-actions Plan 02 (AppState ai_conversations field + search pipeline wiring)
 Resume file: None
