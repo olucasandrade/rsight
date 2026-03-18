@@ -1,3 +1,16 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: unknown
+last_updated: "2026-03-18T18:41:22.463Z"
+progress:
+  total_phases: 1
+  completed_phases: 0
+  total_plans: 5
+  completed_plans: 4
+---
+
 # Project State
 
 ## Project Reference
@@ -10,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 1 of 3 (Search Core)
-Plan: 1 of 5 in current phase
+Plan: 3 of 5 in current phase
 Status: In progress
-Last activity: 2026-03-18 — Completed 01-search-core Plan 01 (Bootstrap)
+Last activity: 2026-03-18 — Completed 01-search-core Plan 03 (Content search — full-text with binary detection and size guard)
 
-Progress: [█░░░░░░░░░] 10%
+Progress: [███░░░░░░░] 30%
 
 ## Performance Metrics
 
@@ -34,6 +47,7 @@ Progress: [█░░░░░░░░░] 10%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 01-search-core P03 | 2min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -47,6 +61,11 @@ Recent decisions affecting current work:
 - **mpsc channel streaming API** — search() returns Receiver<SearchResult>, callers consume async (established in 01-01)
 - **SearchResult with owned Strings** — no lifetimes for safe channel transport (established in 01-01)
 - Scan-on-demand preferred over persistent daemon for memory reasons
+- [Phase 01-search-core]: Two-pass collect-then-parallel strategy chosen for search_contents to avoid WalkBuilder lifetime issues with rayon
+- [Phase 01-search-core]: blocking_send used from rayon threads for mpsc streaming since rayon threads are not inside tokio runtime
+- [01-02]: hidden(false) and git_ignore(false) on WalkBuilder to traverse all files including dotfiles (SRCH-04)
+- [01-02]: filter_entry prunes entire subtrees at excluded directories for efficiency
+- [01-02]: search_names takes mpsc::Sender (not returning Receiver) — caller controls channel lifecycle; Plan 04 must spawn in tokio::task::spawn_blocking
 
 ### Pending Todos
 
@@ -59,5 +78,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 01-search-core-01-PLAN.md (Bootstrap — Cargo workspace, SearchResult types, dependency stack)
+Stopped at: Completed 01-search-core-03-PLAN.md (Content search — full-text with binary detection and size guard)
 Resume file: None
