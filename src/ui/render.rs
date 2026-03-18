@@ -8,6 +8,7 @@ use ratatui::{
 use crate::app::{AppState, TabKind};
 use crate::types::SearchResult;
 use super::layout::build_layout;
+use super::highlight::highlight_spans;
 
 /// Render the entire UI from current AppState. Called every frame.
 pub fn draw_ui(frame: &mut Frame, app: &AppState) {
@@ -75,10 +76,7 @@ fn draw_results(frame: &mut Frame, app: &AppState, area: ratatui::layout::Rect) 
 
     let items: Vec<ListItem> = results
         .iter()
-        .map(|result| {
-            let line = format_result(result, terminal_width);
-            ListItem::new(line)
-        })
+        .map(|result| make_list_item(result, &app.query, terminal_width))
         .collect();
 
     let block = Block::default().borders(Borders::ALL);
@@ -98,31 +96,49 @@ fn draw_results(frame: &mut Frame, app: &AppState, area: ratatui::layout::Rect) 
     frame.render_stateful_widget(list, area, &mut list_state);
 }
 
-fn format_result(result: &SearchResult, max_width: usize) -> String {
+fn make_list_item(result: &SearchResult, query: &str, max_width: usize) -> ListItem<'static> {
     match result {
         SearchResult::File { name, path, .. } | SearchResult::Folder { name, path, .. } => {
-            // "name  dimmed_full_path" — truncate path if too wide
-            let prefix = format!("{}  ", name);
-            let remaining = max_width.saturating_sub(prefix.len());
-            let path_display = if path.len() > remaining {
-                format!("...{}", &path[path.len().saturating_sub(remaining.saturating_sub(3))..])
-            } else {
-                path.clone()
-            };
-            format!("{}{}", prefix, path_display)
+            // Highlight the name portion; path is always dimmed plain text
+            let name_spans = highlight_spans(name.clone(), query);
+            let separator = Span::raw("  ");
+            let path_truncated = truncate_path(path, max_width.saturating_sub(name.len() + 2));
+            let path_span = Span::styled(
+                path_truncated,
+                Style::default().fg(Color::DarkGray),
+            );
+            let mut spans = name_spans;
+            spans.push(separator);
+            spans.push(path_span);
+            ListItem::new(Line::from(spans))
         }
         SearchResult::ContentMatch { path, line_number, line } => {
-            // "path:line_number  snippet" — truncate to terminal width
+            // Format: "path:line_number  " prefix (plain) + highlighted snippet
             let prefix = format!("{}:{}  ", path, line_number);
+            let snippet = line.trim().to_string();
             let remaining = max_width.saturating_sub(prefix.len());
-            let snippet = line.trim();
-            let snippet_display = if snippet.len() > remaining {
-                &snippet[..remaining]
+            let snippet_truncated = if snippet.len() > remaining {
+                snippet[..remaining].to_string()
             } else {
                 snippet
             };
-            format!("{}{}", prefix, snippet_display)
+            let prefix_span = Span::styled(
+                prefix,
+                Style::default().fg(Color::DarkGray),
+            );
+            let snippet_spans = highlight_spans(snippet_truncated, query);
+            let mut spans = vec![prefix_span];
+            spans.extend(snippet_spans);
+            ListItem::new(Line::from(spans))
         }
+    }
+}
+
+fn truncate_path(path: &str, max_len: usize) -> String {
+    if path.len() <= max_len {
+        path.to_string()
+    } else {
+        format!("...{}", &path[path.len().saturating_sub(max_len.saturating_sub(3))..])
     }
 }
 
