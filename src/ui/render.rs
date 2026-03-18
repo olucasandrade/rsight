@@ -1,12 +1,11 @@
 use ratatui::{
     Frame,
-    layout::Alignment,
     style::{Color, Modifier, Style},
     text::{Line, Span},
     widgets::{Block, Borders, List, ListItem, ListState, Paragraph, Tabs},
 };
 use crate::app::{AppState, TabKind};
-use crate::types::SearchResult;
+use crate::types::{SearchResult, AiSource};
 use super::layout::build_layout;
 use super::highlight::highlight_spans;
 
@@ -65,15 +64,6 @@ fn draw_results(frame: &mut Frame, app: &AppState, area: ratatui::layout::Rect) 
     let results = app.active_results();
     let terminal_width = area.width.saturating_sub(4) as usize; // subtract borders + padding
 
-    if !app.active_tab.is_enabled() {
-        // Disabled tab: show placeholder message
-        let paragraph = Paragraph::new("AI Conversations search coming in a future update.")
-            .block(Block::default().borders(Borders::ALL))
-            .alignment(Alignment::Center);
-        frame.render_widget(paragraph, area);
-        return;
-    }
-
     let items: Vec<ListItem> = results
         .iter()
         .map(|result| make_list_item(result, &app.query, terminal_width))
@@ -131,15 +121,26 @@ fn make_list_item(result: &SearchResult, query: &str, max_width: usize) -> ListI
             spans.extend(snippet_spans);
             ListItem::new(Line::from(spans))
         }
-        SearchResult::AiConversation { title, date, .. } => {
-            // Minimal placeholder rendering; full styled display deferred to a later plan.
-            let label = format!("[AI] {}  {}", title, date);
-            let label_truncated = if label.len() > max_width {
-                label[..max_width].to_string()
-            } else {
-                label
+        SearchResult::AiConversation { title, date, source, .. } => {
+            // Format: highlighted title + dim " · " + dim date + dim source badge
+            let title_spans = highlight_spans(title.clone(), query);
+            let separator = Span::styled(
+                "  ·  ",
+                Style::default().fg(Color::DarkGray),
+            );
+            let date_span = Span::styled(
+                date.clone(),
+                Style::default().fg(Color::DarkGray),
+            );
+            let source_badge = match source {
+                AiSource::ClaudeCode => Span::styled(" [Claude]", Style::default().fg(Color::DarkGray)),
+                AiSource::Cursor => Span::styled(" [Cursor]", Style::default().fg(Color::DarkGray)),
             };
-            ListItem::new(Line::from(Span::raw(label_truncated)))
+            let mut spans = title_spans;
+            spans.push(separator);
+            spans.push(date_span);
+            spans.push(source_badge);
+            ListItem::new(Line::from(spans))
         }
     }
 }
