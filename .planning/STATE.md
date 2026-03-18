@@ -8,7 +8,7 @@ progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 10
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 2 of 3 (TUI Shell)
-Plan: 3 of 5 in current phase — Plan 03 complete
-Status: Phase 2 in progress (3/5 plans done)
-Last activity: 2026-03-18 — Completed 02-tui-shell Plan 03 (Event loop and search wiring)
+Plan: 4 of 5 in current phase — Plan 04 complete
+Status: Phase 2 in progress (4/5 plans done)
+Last activity: 2026-03-18 — Completed 02-tui-shell Plan 04 (Match highlighting and open actions)
 
-Progress: [██████████] 100% (Phase 1) | [████      ] 40% (Phase 2)
+Progress: [██████████] 100% (Phase 1) | [████████  ] 80% (Phase 2)
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [██████████] 100% (Phase 1) | [████      ]
 | Phase 02-tui-shell P01 | 2min | 2 tasks | 3 files |
 | Phase 02-tui-shell P02 | 2min | 2 tasks | 4 files |
 | Phase 02-tui-shell P03 | 2min | 2 tasks | 3 files |
+| Phase 02-tui-shell P04 | 2min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,9 @@ Recent decisions affecting current work:
 - [Phase 02-tui-shell]: ListState constructed locally each frame from app.selected_index — no persistent widget state
 - [Phase 02-tui-shell]: crate::search::debounced_search used in event_loop.rs (inside crate, not rsight:: external consumer)
 - [Phase 02-tui-shell]: NavDir enum avoids collision with ratatui::layout::Direction; KeyEventKind::Press filter prevents duplicate key events
+- [Phase 02-tui-shell]: highlight_spans uses case-insensitive greedy substring match (first occurrence) — lightweight, no fuzzy overhead
+- [Phase 02-tui-shell]: make_list_item returns ListItem<'static> via owned Strings to avoid lifetime propagation into ratatui widgets
+- [Phase 02-tui-shell]: clone result before open_result to resolve immutable/mutable borrow conflict on AppState
 
 ### Pending Todos
 
@@ -93,5 +97,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 02-tui-shell-03-PLAN.md (Event loop and search wiring)
+Stopped at: Completed 02-tui-shell-04-PLAN.md (Match highlighting and open actions)
 Resume file: None
