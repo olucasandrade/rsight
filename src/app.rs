@@ -32,9 +32,9 @@ impl TabKind {
         }
     }
 
-    /// AI Conversations tab is disabled until Phase 3.
+    /// All tabs enabled as of Phase 3.
     pub fn is_enabled(&self) -> bool {
-        !matches!(self, TabKind::AiConversations)
+        true
     }
 }
 
@@ -50,6 +50,8 @@ pub struct AppState {
     pub folders: Vec<SearchResult>,
     /// Content match results (capped at 100, in discovery order).
     pub contents: Vec<SearchResult>,
+    /// AI conversation search results (capped at 100, in discovery order).
+    pub ai_conversations: Vec<SearchResult>,
     /// Selected row index within the active tab's result list.
     pub selected_index: usize,
     /// Handle for the running debounced search task. Abort on new keystroke.
@@ -74,6 +76,7 @@ impl AppState {
             files: Vec::new(),
             folders: Vec::new(),
             contents: Vec::new(),
+            ai_conversations: Vec::new(),
             selected_index: 0,
             search_handle: None,
             result_tx,
@@ -89,7 +92,7 @@ impl AppState {
             TabKind::Files => &self.files,
             TabKind::Folders => &self.folders,
             TabKind::Contents => &self.contents,
-            TabKind::AiConversations => &[], // disabled in Phase 2
+            TabKind::AiConversations => &self.ai_conversations,
         }
     }
 
@@ -98,6 +101,7 @@ impl AppState {
         self.files.clear();
         self.folders.clear();
         self.contents.clear();
+        self.ai_conversations.clear();
         self.selected_index = 0;
         self.status_message = None;
     }
@@ -134,8 +138,9 @@ impl AppState {
                 }
             }
             SearchResult::AiConversation { .. } => {
-                // AiConversation results will be routed to a dedicated tab in a later plan.
-                // For now, silently drop them to keep existing tabs intact.
+                if self.ai_conversations.len() < CAP {
+                    self.ai_conversations.push(result);
+                }
             }
         }
     }
