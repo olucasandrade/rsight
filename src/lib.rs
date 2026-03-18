@@ -17,3 +17,4 @@ pub use search::SearchHandle;
 pub use app::AppState;
 pub use app::TabKind;
 pub use ui::draw_ui;
+pub use ai_search::search_ai_conversations;

@@ -3,6 +3,7 @@ use tokio::task;
 use tokio::time::{sleep, Duration};
 use crate::types::SearchResult;
 use crate::{search_names, search_contents};
+use crate::ai_search::search_ai_conversations;
 
 /// Channel buffer size. Large enough to avoid backpressure during fast traversal.
 const CHANNEL_BUFFER: usize = 4096;
@@ -33,11 +34,20 @@ pub async fn search(root: &str, query: &str) -> mpsc::Receiver<SearchResult> {
 
     // Spawn content search as a blocking task (rayon-parallel, sync)
     let tx_content = tx.clone();
+    let root_content = root_owned.clone();
+    let query_content = query_owned.clone();
     task::spawn_blocking(move || {
-        search_contents(&root_owned, &query_owned, tx_content);
+        search_contents(&root_content, &query_content, tx_content);
     });
 
-    // tx (original) is dropped here — channel closes when both tasks finish
+    // Spawn AI conversation search as a blocking task
+    let tx_ai = tx.clone();
+    let query_ai = query_owned.clone();
+    task::spawn_blocking(move || {
+        search_ai_conversations(&query_ai, tx_ai);
+    });
+
+    // tx (original) is dropped here — channel closes when all three tasks finish
     rx
 }
 
