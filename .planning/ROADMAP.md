@@ -38,7 +38,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Results appear under four tabs (Files, Folders, Contents, AI Conversations) and update as the user types
   3. User can move between results with arrow keys, switch tabs, confirm with Enter, and quit with Esc
   4. Query matches are visually highlighted in filenames, content snippets, and conversation excerpts
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 02-tui-shell-01-PLAN.md — ratatui/crossterm dependencies + AppState and TabKind types
+- [ ] 02-tui-shell-02-PLAN.md — TUI layout and rendering (search bar, tab bar, results list, status bar)
+- [ ] 02-tui-shell-03-PLAN.md — Event loop and search wiring (keyboard input, debounced_search, result drain)
+- [ ] 02-tui-shell-04-PLAN.md — Match highlighting and open/copy actions (Enter, Ctrl+C)
+- [ ] 02-tui-shell-05-PLAN.md — Visual verification checkpoint
 
 ### Phase 3: AI Conversations + Open Actions
 **Goal**: Users can search Claude Code and Cursor conversation history and open any result type in its native application
@@ -60,5 +67,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Search Core | 5/5 | Complete   | 2026-03-18 |
-| 2. TUI Shell | 0/TBD | Not started | - |
+| 2. TUI Shell | 0/5 | Not started | - |
 | 3. AI Conversations + Open Actions | 0/TBD | Not started | - |
