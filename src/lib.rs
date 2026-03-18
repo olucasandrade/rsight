@@ -6,6 +6,7 @@ pub mod app;
 pub mod ui;
 pub mod event_loop;
 pub mod actions;
+pub mod ai_search;
 
 pub use types::SearchResult;
 pub use name_search::search_names;

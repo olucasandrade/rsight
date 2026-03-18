@@ -10,6 +10,7 @@ rayon = "1"             # data-parallel iterators for content search
 fuzzy-matcher = "0.3"   # fuzzy name matching (SkimMatcherV2 algorithm)
 ratatui = "0.29"
 crossterm = { version = "0.28", features = ["event-stream"] }
+serde_json = "1"        # JSON parsing for Claude Code JSONL conversations
 
 [dev-dependencies]
 tempfile = "3"
