@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 1 of 3 (Search Core)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-18 — Roadmap created
+Plan: 1 of 5 in current phase
+Status: In progress
+Last activity: 2026-03-18 — Completed 01-search-core Plan 01 (Bootstrap)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 2 min
+- Total execution time: 0.03 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-search-core | 1 / 5 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: —
+- Last 5 plans: 01-01 (2 min)
 - Trend: —
 
 *Updated after each plan completion*
@@ -42,7 +42,10 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- Rust or Go: pending — final choice during Phase 1 planning based on TUI ecosystem maturity
+- **Rust chosen** — raw performance and minimal memory overhead (confirmed in 01-01)
+- **ignore crate** — ripgrep's parallel traversal engine, respects .gitignore (confirmed in 01-01)
+- **mpsc channel streaming API** — search() returns Receiver<SearchResult>, callers consume async (established in 01-01)
+- **SearchResult with owned Strings** — no lifetimes for safe channel transport (established in 01-01)
 - Scan-on-demand preferred over persistent daemon for memory reasons
 
 ### Pending Todos
@@ -56,5 +59,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Roadmap created, ready to plan Phase 1
+Stopped at: Completed 01-search-core-01-PLAN.md (Bootstrap — Cargo workspace, SearchResult types, dependency stack)
 Resume file: None

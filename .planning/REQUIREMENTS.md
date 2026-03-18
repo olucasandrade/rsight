@@ -16,8 +16,8 @@
 
 - [ ] **SRCH-01**: User can search file and folder names using fuzzy matching
 - [ ] **SRCH-02**: User can search file contents using exact full-text matching
-- [ ] **SRCH-03**: Results appear in under 1 second on a typical developer machine
-- [ ] **SRCH-04**: Search scope is the user's entire $HOME directory recursively
+- [x] **SRCH-03**: Results appear in under 1 second on a typical developer machine
+- [x] **SRCH-04**: Search scope is the user's entire $HOME directory recursively
 
 ### AI Conversations
 
@@ -66,8 +66,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TUI-04 | Phase 2 | Pending |
 | SRCH-01 | Phase 1 | Pending |
 | SRCH-02 | Phase 1 | Pending |
-| SRCH-03 | Phase 1 | Pending |
-| SRCH-04 | Phase 1 | Pending |
+| SRCH-03 | Phase 1 | Complete |
+| SRCH-04 | Phase 1 | Complete |
 | AICV-01 | Phase 3 | Pending |
 | AICV-02 | Phase 3 | Pending |
 | AICV-03 | Phase 3 | Pending |
