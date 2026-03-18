@@ -1,6 +1,12 @@
 pub mod types;
 pub use types::SearchResult;
 
+pub mod content_search;
+pub use content_search::search_contents;
+
+pub mod name_search;
+pub use name_search::search_names;
+
 use tokio::sync::mpsc;
 
 /// Stub search function — implemented in Plans 02-04.

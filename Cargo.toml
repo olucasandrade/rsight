@@ -9,6 +9,9 @@ tokio = { version = "1", features = ["full"] }  # async runtime for debounced se
 rayon = "1"             # data-parallel iterators for content search
 fuzzy-matcher = "0.3"   # fuzzy name matching (SkimMatcherV2 algorithm)
 
+[dev-dependencies]
+tempfile = "3"
+
 [profile.release]
 opt-level = 3
 lto = true
