@@ -95,12 +95,10 @@ async fn handle_key(app: &mut AppState, code: KeyCode, modifiers: KeyModifiers, 
 
         // Text input
         (KeyCode::Char(c), KeyModifiers::NONE) | (KeyCode::Char(c), KeyModifiers::SHIFT) => {
-            let was_empty = app.query.is_empty();
             app.query.push(c);
-            // Reset to Files tab when user starts typing after clearing query
-            if was_empty {
-                app.active_tab = TabKind::Files;
-            }
+            // Active tab is intentionally NOT reset here — the user's current tab
+            // (Files, Contents, Folders) is preserved when the query changes.
+            // Tab switching is only driven by explicit Tab/Shift+Tab keypresses.
             app.clear_results();
             trigger_search(app, home).await;
         }
