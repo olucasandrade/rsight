@@ -22,6 +22,10 @@ pub fn open_result(result: &SearchResult) {
                 let _ = Command::new("open").arg(path).spawn();
             }
         }
+        SearchResult::AiConversation { path, .. } => {
+            // Open the containing directory; full "resume" action deferred to a later plan.
+            let _ = Command::new("open").arg(path).spawn();
+        }
     }
 }
 
@@ -41,6 +45,7 @@ pub fn result_path(result: &SearchResult) -> &str {
     match result {
         SearchResult::File { path, .. }
         | SearchResult::Folder { path, .. }
-        | SearchResult::ContentMatch { path, .. } => path.as_str(),
+        | SearchResult::ContentMatch { path, .. }
+        | SearchResult::AiConversation { path, .. } => path.as_str(),
     }
 }

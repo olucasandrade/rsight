@@ -131,6 +131,16 @@ fn make_list_item(result: &SearchResult, query: &str, max_width: usize) -> ListI
             spans.extend(snippet_spans);
             ListItem::new(Line::from(spans))
         }
+        SearchResult::AiConversation { title, date, .. } => {
+            // Minimal placeholder rendering; full styled display deferred to a later plan.
+            let label = format!("[AI] {}  {}", title, date);
+            let label_truncated = if label.len() > max_width {
+                label[..max_width].to_string()
+            } else {
+                label
+            };
+            ListItem::new(Line::from(Span::raw(label_truncated)))
+        }
     }
 }
 

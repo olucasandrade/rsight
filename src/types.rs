@@ -1,3 +1,10 @@
+/// Which AI tool produced a conversation result.
+#[derive(Debug, Clone, PartialEq)]
+pub enum AiSource {
+    ClaudeCode,
+    Cursor,
+}
+
 /// A single search result from any search category.
 #[derive(Debug, Clone)]
 pub enum SearchResult {
@@ -27,5 +34,18 @@ pub enum SearchResult {
         line_number: u64,
         /// The full text of the matching line (trimmed to reasonable length).
         line: String,
+    },
+    /// An AI conversation (Claude Code JSONL or Cursor SQLite) matching the query.
+    AiConversation {
+        /// Absolute path to the conversation file (JSONL or store.db).
+        path: String,
+        /// Conversation ID used for resuming (session UUID for Claude, agentId for Cursor).
+        conversation_id: String,
+        /// Derived title: first human message truncated to 60 chars, or filename stem.
+        title: String,
+        /// Human-readable date, e.g. "Mar 15" or "Mar 18".
+        date: String,
+        /// Which AI tool produced this conversation.
+        source: AiSource,
     },
 }

@@ -133,6 +133,10 @@ impl AppState {
                     self.contents.push(result);
                 }
             }
+            SearchResult::AiConversation { .. } => {
+                // AiConversation results will be routed to a dedicated tab in a later plan.
+                // For now, silently drop them to keep existing tabs intact.
+            }
         }
     }
 }
