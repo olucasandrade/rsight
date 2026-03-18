@@ -1,5 +1,5 @@
 use std::process::Command;
-use crate::types::SearchResult;
+use crate::types::{SearchResult, AiSource};
 
 /// Open a search result with the appropriate application.
 /// - File/Folder: uses macOS `open` command (system default app)
@@ -22,9 +22,54 @@ pub fn open_result(result: &SearchResult) {
                 let _ = Command::new("open").arg(path).spawn();
             }
         }
-        SearchResult::AiConversation { path, .. } => {
-            // Open the containing directory; full "resume" action deferred to a later plan.
-            let _ = Command::new("open").arg(path).spawn();
+        SearchResult::AiConversation { .. } => {
+            // AI conversations are handled by open_conversation() — not this function.
+        }
+    }
+}
+
+/// Open a conversation in its native application.
+/// For Claude Code: opens a new Terminal.app window running `claude --resume <id>`.
+/// For Cursor: opens Cursor via CLI, or falls back to open -a Cursor.
+/// rsight stays alive — uses spawn (non-blocking).
+/// Sets status_message on error (CLI not found).
+pub fn open_conversation(result: &SearchResult, status_message: &mut Option<String>) {
+    if let SearchResult::AiConversation { conversation_id, path, source, .. } = result {
+        match source {
+            AiSource::ClaudeCode => {
+                // Check if claude CLI is available
+                let claude_check = Command::new("which").arg("claude").output();
+                if claude_check.map(|o| o.status.success()).unwrap_or(false) {
+                    // Open new Terminal.app window with claude --resume <id>
+                    let script = format!(
+                        "tell application \"Terminal\" to do script \"claude --resume {}\"",
+                        conversation_id
+                    );
+                    let _ = Command::new("osascript")
+                        .arg("-e")
+                        .arg(&script)
+                        .spawn();
+                } else {
+                    *status_message = Some(
+                        "claude CLI not found — install at claude.ai/code".to_string()
+                    );
+                }
+            }
+            AiSource::Cursor => {
+                // Check if cursor CLI is available
+                let cursor_check = Command::new("which").arg("cursor").output();
+                if cursor_check.map(|o| o.status.success()).unwrap_or(false) {
+                    let _ = Command::new("cursor").arg(path).spawn();
+                } else {
+                    // Fall back to opening Cursor.app directly
+                    let app_result = Command::new("open").args(["-a", "Cursor"]).output();
+                    if !app_result.map(|o| o.status.success()).unwrap_or(false) {
+                        *status_message = Some(
+                            "cursor not found — install Cursor from cursor.sh".to_string()
+                        );
+                    }
+                }
+            }
         }
     }
 }

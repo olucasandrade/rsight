@@ -9,7 +9,8 @@ use ratatui::{backend::CrosstermBackend, Terminal};
 use crate::app::{AppState, TabKind};
 use crate::ui::draw_ui;
 use crate::search::debounced_search;
-use crate::actions::{open_result, copy_to_clipboard, result_path};
+use crate::actions::{open_result, open_conversation, copy_to_clipboard, result_path};
+use crate::types::SearchResult;
 
 const SEARCH_DELAY_MS: u64 = 150;
 const TICK_MS: u64 = 16; // ~60fps polling interval
@@ -117,15 +118,17 @@ async fn handle_key(app: &mut AppState, code: KeyCode, modifiers: KeyModifiers, 
 
         // Open selected result
         (KeyCode::Enter, _) => {
-            if !app.active_tab.is_enabled() {
-                // Disabled AI tab: show status message
-                app.status_message = Some("AI search coming in a future update".to_string());
-            } else {
-                let results = app.active_results();
-                if !results.is_empty() {
-                    let idx = app.selected_index.min(results.len() - 1);
-                    let result = results[idx].clone();
-                    open_result(&result);
+            let results = app.active_results();
+            if !results.is_empty() {
+                let idx = app.selected_index.min(results.len() - 1);
+                let result = results[idx].clone();
+                match &result {
+                    SearchResult::AiConversation { .. } => {
+                        open_conversation(&result, &mut app.status_message);
+                    }
+                    _ => {
+                        open_result(&result);
+                    }
                 }
             }
         }
