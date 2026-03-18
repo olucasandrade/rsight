@@ -114,6 +114,7 @@ None yet.
 - ~~Cursor conversation format (~/.cursor/) is TBD — needs investigation before Phase 3~~: RESOLVED — hex-encoded JSON meta table; implemented in 03-01
 - ~~**[GAP-01] Content search performance**~~: CLOSED — exclusion list expanded, build_parallel() adopted, 100-result cap added (commit 1cc9ec9)
 - ~~**[GAP-02] Tab persistence regression**~~: CLOSED — active_tab reset removed from query-change handler (commit 7f60d7d)
+- ~~**[GAP-03] AI conversation titles show UUID / TUI layout broken by embedded newlines**~~: CLOSED — claude.rs now handles content-as-array (Claude Code JSONL block format) and sanitizes titles (strip \n/\r/\t) before truncation (commit 0b7fbd1)
 
 ## Session Continuity
 
