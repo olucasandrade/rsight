@@ -1,0 +1,15 @@
+[package]
+name = "rsight"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ignore = "0.4"          # parallel directory traversal (battle-tested, used by ripgrep)
+tokio = { version = "1", features = ["full"] }  # async runtime for debounced search cancellation
+rayon = "1"             # data-parallel iterators for content search
+fuzzy-matcher = "0.3"   # fuzzy name matching (SkimMatcherV2 algorithm)
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
