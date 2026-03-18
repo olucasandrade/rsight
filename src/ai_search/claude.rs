@@ -84,24 +84,46 @@ fn process_jsonl_file(path: &Path, query: &str, tx: &mpsc::Sender<SearchResult>)
             let is_meta = v.get("isMeta").and_then(|m| m.as_bool()).unwrap_or(false);
 
             if type_val == "user" && !is_meta {
-                // Try to extract message.content as string
-                if let Some(content_str) = v
-                    .get("message")
-                    .and_then(|m| m.get("content"))
-                    .and_then(|c| c.as_str())
-                {
-                    let trimmed = content_str.trim();
-                    if !trimmed.starts_with('<') {
+                let content_val = v.get("message").and_then(|m| m.get("content"));
+
+                // Extract raw text: content may be a plain string or an array of blocks
+                let raw_text: Option<String> = content_val.and_then(|c| {
+                    // Try plain string first
+                    if let Some(s) = c.as_str() {
+                        return Some(s.to_string());
+                    }
+                    // Fall back to array of content blocks (Claude Code JSONL format)
+                    if let Some(arr) = c.as_array() {
+                        for block in arr {
+                            if block.get("type").and_then(|t| t.as_str()) == Some("text") {
+                                if let Some(text) = block.get("text").and_then(|t| t.as_str()) {
+                                    return Some(text.to_string());
+                                }
+                            }
+                        }
+                    }
+                    None
+                });
+
+                if let Some(raw) = raw_text {
+                    // Sanitize: strip newlines and control chars, then trim
+                    let sanitized = raw.replace('\n', " ").replace('\r', "").replace('\t', " ");
+                    let trimmed = sanitized.trim().to_string();
+                    if !trimmed.starts_with('<') && !trimmed.is_empty() {
                         // Extract date from timestamp
                         if let Some(ts) = v.get("timestamp").and_then(|t| t.as_str()) {
                             date = parse_iso_date(ts);
                         }
 
-                        // Truncate title to 60 chars
+                        // Truncate title to 60 chars (byte-safe: find char boundary)
                         let t = if trimmed.len() > 60 {
-                            trimmed[..60].to_string()
+                            let mut end = 60;
+                            while !trimmed.is_char_boundary(end) {
+                                end -= 1;
+                            }
+                            trimmed[..end].to_string()
                         } else {
-                            trimmed.to_string()
+                            trimmed
                         };
                         title = t;
                         found_title = true;
