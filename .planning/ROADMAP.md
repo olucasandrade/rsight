@@ -68,4 +68,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Search Core | 5/5 | Complete | 2026-03-18 |
 | 2. TUI Shell | 5/5 plans done | Gap closure required (2 gaps) | - |
-| 3. AI Conversations + Open Actions | 2/4 | In Progress|  |
+| 3. AI Conversations + Open Actions | 3/4 | In Progress|  |

@@ -24,12 +24,12 @@
 - [x] **AICV-01**: User can search Claude Code conversation content (~/.claude/projects/)
 - [x] **AICV-02**: User can search Cursor conversation content (~/.cursor/)
 - [x] **AICV-03**: Each AI conversation result shows a title or first-message summary
-- [ ] **AICV-04**: Selecting an AI conversation result resumes it via native command (claude --resume <id> or Cursor equivalent)
+- [x] **AICV-04**: Selecting an AI conversation result resumes it via native command (claude --resume <id> or Cursor equivalent)
 
 ### Open Actions
 
-- [ ] **OPEN-01**: Selecting a file result opens it in $EDITOR
-- [ ] **OPEN-02**: Selecting a folder result opens it in the system file manager (xdg-open / open)
+- [x] **OPEN-01**: Selecting a file result opens it in $EDITOR
+- [x] **OPEN-02**: Selecting a folder result opens it in the system file manager (xdg-open / open)
 
 ## v2 Requirements
 
@@ -71,9 +71,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AICV-01 | Phase 3 | Complete |
 | AICV-02 | Phase 3 | Complete |
 | AICV-03 | Phase 3 | Complete |
-| AICV-04 | Phase 3 | Pending |
-| OPEN-01 | Phase 3 | Pending |
-| OPEN-02 | Phase 3 | Pending |
+| AICV-04 | Phase 3 | Complete |
+| OPEN-01 | Phase 3 | Complete |
+| OPEN-02 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 14 total

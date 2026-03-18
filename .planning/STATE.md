@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 3 of 3 (AI Conversations & Open Actions)
-Plan: 2 of 4 in current phase — Plan 02 complete
-Status: Phase 3 in progress — AppState wired, AI Conversations tab enabled, search pipeline live
-Last activity: 2026-03-18 — Completed 03-ai-conversations-open-actions Plan 02 (AppState + search pipeline wiring)
+Plan: 3 of 4 in current phase — Plan 03 complete
+Status: Phase 3 in progress — AI conversation rendering and open actions wired
+Last activity: 2026-03-18 — Completed 03-ai-conversations-open-actions Plan 03 (TUI rendering + open_conversation + Enter dispatch)
 
-Progress: [██████████] 100% (Phase 1) | [██████████] 100% (Phase 2) | [████░░░░░░] 50% (Phase 3, 2/4 plans)
+Progress: [██████████] 100% (Phase 1) | [██████████] 100% (Phase 2) | [██████░░░░] 75% (Phase 3, 3/4 plans)
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Progress: [██████████] 100% (Phase 1) | [██████�
 | Phase 02-tui-shell P05 | 10min | 1 task (checkpoint) | 0 files |
 | Phase 03-ai-conversations-open-actions P01 | 5min | 3 tasks | 9 files |
 | Phase 03-ai-conversations-open-actions P02 | 2min | 2 tasks | 4 files |
+| Phase 03-ai-conversations-open-actions P03 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,9 @@ Recent decisions affecting current work:
 - [03-02]: search_ai_conversations bridges std::sync::mpsc (parsers) to tokio::sync::mpsc (search pipeline) via internal channel and blocking_send forwarding loop
 - [03-02]: AI Conversations tab enabled globally as of Phase 3 — is_enabled() returns true unconditionally
 - [03-02]: search() now spawns three concurrent blocking tasks (name, content, AI conversations) — channel closes when all three finish
+- [03-03]: osascript 'tell application Terminal to do script' used to open new Terminal window for Claude Code — rsight stays alive
+- [03-03]: Cursor CLI checked via 'which cursor'; falls back to 'open -a Cursor' if CLI absent
+- [03-03]: Enter handler dispatches by SearchResult variant (not by tab) — avoids tab-identity coupling
 
 ### Pending Todos
 
@@ -114,5 +118,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 03-ai-conversations-open-actions Plan 02 (AppState ai_conversations field + search pipeline wiring)
+Stopped at: Completed 03-ai-conversations-open-actions Plan 03 (TUI rendering + open_conversation + Enter dispatch)
 Resume file: None
