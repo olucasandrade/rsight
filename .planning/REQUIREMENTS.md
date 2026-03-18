@@ -21,9 +21,9 @@
 
 ### AI Conversations
 
-- [ ] **AICV-01**: User can search Claude Code conversation content (~/.claude/projects/)
-- [ ] **AICV-02**: User can search Cursor conversation content (~/.cursor/)
-- [ ] **AICV-03**: Each AI conversation result shows a title or first-message summary
+- [x] **AICV-01**: User can search Claude Code conversation content (~/.claude/projects/)
+- [x] **AICV-02**: User can search Cursor conversation content (~/.cursor/)
+- [x] **AICV-03**: Each AI conversation result shows a title or first-message summary
 - [ ] **AICV-04**: Selecting an AI conversation result resumes it via native command (claude --resume <id> or Cursor equivalent)
 
 ### Open Actions
@@ -68,9 +68,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRCH-02 | Phase 1 | Complete |
 | SRCH-03 | Phase 1 | Complete |
 | SRCH-04 | Phase 1 | Complete |
-| AICV-01 | Phase 3 | Pending |
-| AICV-02 | Phase 3 | Pending |
-| AICV-03 | Phase 3 | Pending |
+| AICV-01 | Phase 3 | Complete |
+| AICV-02 | Phase 3 | Complete |
+| AICV-03 | Phase 3 | Complete |
 | AICV-04 | Phase 3 | Pending |
 | OPEN-01 | Phase 3 | Pending |
 | OPEN-02 | Phase 3 | Pending |

@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-18T19:41:50.424Z"
+last_updated: "2026-03-18T20:06:15.286Z"
 progress:
-  total_phases: 2
+  total_phases: 3
   completed_phases: 2
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 14
+  completed_plans: 11
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** Find anything in your home directory — including AI conversation history — in under a second, without leaving the terminal.
-**Current focus:** Phase 2 — TUI Shell
+**Current focus:** Phase 3 — AI Conversations & Open Actions
 
 ## Current Position
 
-Phase: 2 of 3 (TUI Shell)
-Plan: 5 of 5 in current phase — Plan 05 complete (with gaps)
-Status: Phase 2 plans complete — gap closure required before Phase 3
-Last activity: 2026-03-18 — Completed 02-tui-shell Plan 05 (Visual verification — 2 gaps found)
+Phase: 3 of 3 (AI Conversations & Open Actions)
+Plan: 1 of 4 in current phase — Plan 01 complete
+Status: Phase 3 in progress — data layer (AiConversation type + parsers) complete
+Last activity: 2026-03-18 — Completed 03-ai-conversations-open-actions Plan 01 (AiConversation type + Claude + Cursor parsers)
 
-Progress: [██████████] 100% (Phase 1) | [██████████] 100% plans done (Phase 2, gap closure pending)
+Progress: [██████████] 100% (Phase 1) | [██████████] 100% (Phase 2) | [██░░░░░░░░] 25% (Phase 3, 1/4 plans)
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [██████████] 100% (Phase 1) | [██████�
 | Phase 02-tui-shell P03 | 2min | 2 tasks | 3 files |
 | Phase 02-tui-shell P04 | 2min | 2 tasks | 6 files |
 | Phase 02-tui-shell P05 | 10min | 1 task (checkpoint) | 0 files |
+| Phase 03-ai-conversations-open-actions P01 | 5min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,9 @@ Recent decisions affecting current work:
 - [02-gap closure]: WalkBuilder switched from build() to build_parallel() — directory traversal is now multi-threaded, matching rayon parallelism already used for file reads
 - [02-gap closure]: MAX_CONTENT_RESULTS=100 cap enforced atomically in search_contents — consistent with AppState 100-result-per-tab cap; prevents unbounded streaming on large trees
 - [02-gap closure]: active_tab is no longer reset on query-change in event_loop.rs; tab transitions are now exclusively explicit (Tab/Shift+Tab)
+- [Phase 03-ai-conversations-open-actions]: serde_json added to Cargo.toml — was absent despite plan assuming it existed
+- [Phase 03-ai-conversations-open-actions]: rusqlite bundled feature — avoids system SQLite dependency
+- [Phase 03-ai-conversations-open-actions]: ai_search parsers use std::sync::mpsc not tokio::sync::mpsc — parsers are sync, not inside tokio runtime
 
 ### Pending Todos
 
@@ -99,12 +103,12 @@ None yet.
 
 ### Blockers/Concerns
 
-- Cursor conversation format (~/.cursor/) is TBD — needs investigation before Phase 3
+- ~~Cursor conversation format (~/.cursor/) is TBD — needs investigation before Phase 3~~: RESOLVED — hex-encoded JSON meta table; implemented in 03-01
 - ~~**[GAP-01] Content search performance**~~: CLOSED — exclusion list expanded, build_parallel() adopted, 100-result cap added (commit 1cc9ec9)
 - ~~**[GAP-02] Tab persistence regression**~~: CLOSED — active_tab reset removed from query-change handler (commit 7f60d7d)
 
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 02-gap closure — GAP-01 (content search perf) and GAP-02 (tab persistence) both fixed and committed
+Stopped at: Completed 03-ai-conversations-open-actions Plan 01 (AiConversation type + Claude Code + Cursor parsers)
 Resume file: None
