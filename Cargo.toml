@@ -11,6 +11,11 @@ fuzzy-matcher = "0.3"   # fuzzy name matching (SkimMatcherV2 algorithm)
 
 [dev-dependencies]
 tempfile = "3"
+criterion = { version = "0.5", features = ["async_tokio"] }
+
+[[bench]]
+name = "search_bench"
+harness = false
 
 [profile.release]
 opt-level = 3
