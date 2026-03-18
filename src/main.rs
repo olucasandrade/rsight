@@ -1,17 +1,29 @@
-use rsight::search;
+use rsight::event_loop::{init_terminal, restore_terminal, run_app};
+use rsight::app::AppState;
 
 #[tokio::main]
-async fn main() {
-    let home = std::env::var("HOME").unwrap_or_else(|_| ".".into());
-    let query = std::env::args().nth(1).unwrap_or_else(|| "main".into());
+async fn main() -> std::io::Result<()> {
+    // Initialize ratatui terminal (raw mode, alternate screen)
+    let mut terminal = init_terminal()?;
 
-    println!("Searching {} for {:?}...", home, query);
-    let mut rx = search(&home, &query).await;
-    let mut count = 0;
-    while let Some(result) = rx.recv().await {
-        println!("{:?}", result);
-        count += 1;
-        if count >= 10 { break; }
-    }
-    println!("Done. {} results shown (max 10).", count);
+    // Set up a panic hook to restore the terminal before printing panic info.
+    // Without this, a panic leaves the terminal in raw mode.
+    let original_hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |panic_info| {
+        // Best-effort terminal restore (ignore errors)
+        let _ = crossterm::terminal::disable_raw_mode();
+        let _ = crossterm::execute!(
+            std::io::stdout(),
+            crossterm::terminal::LeaveAlternateScreen
+        );
+        original_hook(panic_info);
+    }));
+
+    let mut app = AppState::new();
+    let result = run_app(&mut terminal, &mut app).await;
+
+    // Always restore terminal, even on error
+    restore_terminal(&mut terminal)?;
+
+    result
 }
