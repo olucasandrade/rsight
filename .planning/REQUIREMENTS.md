@@ -60,26 +60,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TUI-01 | — | Pending |
-| TUI-02 | — | Pending |
-| TUI-03 | — | Pending |
-| TUI-04 | — | Pending |
-| SRCH-01 | — | Pending |
-| SRCH-02 | — | Pending |
-| SRCH-03 | — | Pending |
-| SRCH-04 | — | Pending |
-| AICV-01 | — | Pending |
-| AICV-02 | — | Pending |
-| AICV-03 | — | Pending |
-| AICV-04 | — | Pending |
-| OPEN-01 | — | Pending |
-| OPEN-02 | — | Pending |
+| TUI-01 | Phase 2 | Pending |
+| TUI-02 | Phase 2 | Pending |
+| TUI-03 | Phase 2 | Pending |
+| TUI-04 | Phase 2 | Pending |
+| SRCH-01 | Phase 1 | Pending |
+| SRCH-02 | Phase 1 | Pending |
+| SRCH-03 | Phase 1 | Pending |
+| SRCH-04 | Phase 1 | Pending |
+| AICV-01 | Phase 3 | Pending |
+| AICV-02 | Phase 3 | Pending |
+| AICV-03 | Phase 3 | Pending |
+| AICV-04 | Phase 3 | Pending |
+| OPEN-01 | Phase 3 | Pending |
+| OPEN-02 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-18*
-*Last updated: 2026-03-18 after initial definition*
+*Last updated: 2026-03-18 after roadmap creation*
