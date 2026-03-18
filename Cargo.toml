@@ -8,6 +8,8 @@ ignore = "0.4"          # parallel directory traversal (battle-tested, used by r
 tokio = { version = "1", features = ["full"] }  # async runtime for debounced search cancellation
 rayon = "1"             # data-parallel iterators for content search
 fuzzy-matcher = "0.3"   # fuzzy name matching (SkimMatcherV2 algorithm)
+ratatui = "0.29"
+crossterm = { version = "0.28", features = ["event-stream"] }
 
 [dev-dependencies]
 tempfile = "3"
