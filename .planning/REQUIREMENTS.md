@@ -7,10 +7,10 @@
 
 ### TUI
 
-- [ ] **TUI-01**: User sees a search bar at the top of the screen that accepts input on launch
-- [ ] **TUI-02**: Results are displayed in tabbed panes: Files, Folders, Contents, AI Conversations
-- [ ] **TUI-03**: User can navigate results with arrow keys, open with Enter, and clear/quit with Esc
-- [ ] **TUI-04**: Search query matches are highlighted in result text (filenames, content snippets, conversation excerpts)
+- [x] **TUI-01**: User sees a search bar at the top of the screen that accepts input on launch
+- [x] **TUI-02**: Results are displayed in tabbed panes: Files, Folders, Contents, AI Conversations
+- [x] **TUI-03**: User can navigate results with arrow keys, open with Enter, and clear/quit with Esc
+- [x] **TUI-04**: Search query matches are highlighted in result text (filenames, content snippets, conversation excerpts)
 
 ### Search
 
@@ -60,10 +60,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TUI-01 | Phase 2 | Pending |
-| TUI-02 | Phase 2 | Pending |
-| TUI-03 | Phase 2 | Pending |
-| TUI-04 | Phase 2 | Pending |
+| TUI-01 | Phase 2 | Complete |
+| TUI-02 | Phase 2 | Complete |
+| TUI-03 | Phase 2 | Complete |
+| TUI-04 | Phase 2 | Complete |
 | SRCH-01 | Phase 1 | Complete |
 | SRCH-02 | Phase 1 | Complete |
 | SRCH-03 | Phase 1 | Complete |

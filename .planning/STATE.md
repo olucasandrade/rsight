@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-18T18:54:52.351Z"
+last_updated: "2026-03-18T19:18:48.304Z"
 progress:
-  total_phases: 1
+  total_phases: 2
   completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 10
+  completed_plans: 6
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** Find anything in your home directory — including AI conversation history — in under a second, without leaving the terminal.
-**Current focus:** Phase 1 — Search Core
+**Current focus:** Phase 2 — TUI Shell
 
 ## Current Position
 
-Phase: 1 of 3 (Search Core)
-Plan: 5 of 5 in current phase — PHASE COMPLETE
-Status: Phase 1 complete, ready for Phase 2
-Last activity: 2026-03-18 — Completed 01-search-core Plan 05 (Performance validation — criterion benchmark + smoke test)
+Phase: 2 of 3 (TUI Shell)
+Plan: 1 of 5 in current phase — Plan 01 complete
+Status: Phase 2 in progress (1/5 plans done)
+Last activity: 2026-03-18 — Completed 02-tui-shell Plan 01 (TUI state types and dependency setup)
 
-Progress: [██████████] 100% (Phase 1)
+Progress: [██████████] 100% (Phase 1) | [██        ] 20% (Phase 2)
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Progress: [██████████] 100% (Phase 1)
 | Phase 01-search-core P03 | 2min | 1 tasks | 2 files |
 | Phase 01-search-core P04 | 2min | 2 tasks | 3 files |
 | Phase 01-search-core P05 | 10min | 2 tasks | 2 files |
+| Phase 02-tui-shell P01 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,8 @@ Recent decisions affecting current work:
 - [01-04]: debounced_search accepts Sender (not returning Receiver) so TUI controls the result channel lifecycle; delay_ms is a parameter for testability
 - [Phase 01-search-core]: criterion async_tokio feature added but bench loops call synchronous functions directly — avoids runtime overhead
 - [Phase 01-search-core]: < 1s requirement scoped to TUI first-result streaming latency, not total CLI wall time
+- [Phase 02-tui-shell]: crate-local imports (crate::) used in app.rs instead of rsight:: — app.rs is inside the crate not a dependent
+- [Phase 02-tui-shell]: AppState owns both ends of the mpsc channel (4096 cap) — no external channel management by callers
 
 ### Pending Todos
 
@@ -84,5 +87,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 01-search-core-05-PLAN.md (Performance validation — Phase 1 complete)
+Stopped at: Completed 02-tui-shell-01-PLAN.md (TUI state types and dependency setup)
 Resume file: None
