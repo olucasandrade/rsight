@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 2 of 3 (TUI Shell)
-Plan: 1 of 5 in current phase — Plan 01 complete
-Status: Phase 2 in progress (1/5 plans done)
-Last activity: 2026-03-18 — Completed 02-tui-shell Plan 01 (TUI state types and dependency setup)
+Plan: 2 of 5 in current phase — Plan 02 complete
+Status: Phase 2 in progress (2/5 plans done)
+Last activity: 2026-03-18 — Completed 02-tui-shell Plan 02 (TUI layout and rendering)
 
-Progress: [██████████] 100% (Phase 1) | [██        ] 20% (Phase 2)
+Progress: [██████████] 100% (Phase 1) | [████      ] 40% (Phase 2)
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Progress: [██████████] 100% (Phase 1) | [██        ] 20%
 | Phase 01-search-core P04 | 2min | 2 tasks | 3 files |
 | Phase 01-search-core P05 | 10min | 2 tasks | 2 files |
 | Phase 02-tui-shell P01 | 2min | 2 tasks | 3 files |
+| Phase 02-tui-shell P02 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,8 @@ Recent decisions affecting current work:
 - [Phase 01-search-core]: < 1s requirement scoped to TUI first-result streaming latency, not total CLI wall time
 - [Phase 02-tui-shell]: crate-local imports (crate::) used in app.rs instead of rsight:: — app.rs is inside the crate not a dependent
 - [Phase 02-tui-shell]: AppState owns both ends of the mpsc channel (4096 cap) — no external channel management by callers
+- [Phase 02-tui-shell]: draw_ui is the sole rendering entry point; format_result produces plain String — styled spans with match highlights deferred to Plan 04
+- [Phase 02-tui-shell]: ListState constructed locally each frame from app.selected_index — no persistent widget state
 
 ### Pending Todos
 
@@ -87,5 +90,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 02-tui-shell-01-PLAN.md (TUI state types and dependency setup)
+Stopped at: Completed 02-tui-shell-02-PLAN.md (TUI layout and rendering)
 Resume file: None
