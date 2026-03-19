@@ -73,7 +73,7 @@ const AI = [
 
 const TABS = ["Files", "Folders", "Contents", "AI"];
 
-const GITHUB_URL = "https://github.com/lucasandrade/rsight";
+const GITHUB_URL = "https://github.com/olucasandrade/rsight";
 
 // ── Terminal Component ──────────────────────────────────────
 
@@ -256,7 +256,7 @@ const INSTALL_METHODS = [
     label: "Homebrew",
     recommended: true,
     lines: [
-      { type: "cmd", text: "brew tap lucasandrade/rsight" },
+      { type: "cmd", text: "brew tap olucasandrade/rsight" },
       { type: "cmd", text: "brew install rsight" },
       { type: "out", text: "==> Downloading rsight-0.1.0.tar.gz" },
       { type: "out", text: "==> Installing rsight" },
@@ -264,7 +264,7 @@ const INSTALL_METHODS = [
       { type: "gap" },
       { type: "cmd", text: "rsight" },
     ],
-    copyText: "brew tap lucasandrade/rsight && brew install rsight",
+    copyText: "brew tap olucasandrade/rsight && brew install rsight",
     note: "Recommended. No Rust toolchain required.",
   },
   {
@@ -274,7 +274,7 @@ const INSTALL_METHODS = [
     lines: [
       {
         type: "cmd",
-        text: "curl -fsSL https://raw.githubusercontent.com/lucasandrade/rsight/main/install.sh | bash",
+        text: "curl -fsSL https://raw.githubusercontent.com/olucasandrade/rsight/main/install.sh | bash",
       },
       { type: "out", text: "Installing rsight v0.1.0 for arm64..." },
       { type: "out", text: "Installed to ~/.local/bin/rsight" },
@@ -282,7 +282,7 @@ const INSTALL_METHODS = [
       { type: "cmd", text: "rsight" },
     ],
     copyText:
-      "curl -fsSL https://raw.githubusercontent.com/lucasandrade/rsight/main/install.sh | bash",
+      "curl -fsSL https://raw.githubusercontent.com/olucasandrade/rsight/main/install.sh | bash",
     note: "Downloads the latest release binary. No Rust required. Installs to ~/.local/bin by default.",
   },
   {
@@ -307,7 +307,7 @@ const INSTALL_METHODS = [
     label: "Source",
     recommended: false,
     lines: [
-      { type: "cmd", text: "git clone github.com/lucasandrade/rsight" },
+      { type: "cmd", text: "git clone github.com/olucasandrade/rsight" },
       { type: "cmd", text: "cd rsight && cargo build --release" },
       { type: "out", text: "Compiling rsight v0.1.0 ..." },
       { type: "out", text: "Finished release [optimized]" },
@@ -315,7 +315,7 @@ const INSTALL_METHODS = [
       { type: "cmd", text: "./target/release/rsight" },
     ],
     copyText:
-      "git clone https://github.com/lucasandrade/rsight && cd rsight && cargo build --release",
+      "git clone https://github.com/olucasandrade/rsight && cd rsight && cargo build --release",
     note: "Requires Rust 1.70+. Builds from latest commits.",
     noteHref: "https://rustup.rs",
     noteLinkText: "Install rustup ↗",
@@ -488,7 +488,7 @@ export const LandingPage = component$(() => {
             <div class="hero-install">
               <span class="prompt">$</span>
               <code>brew install rsight</code>
-              <CopyBtn text="brew tap lucasandrade/rsight && brew install rsight" />
+              <CopyBtn text="brew tap olucasandrade/rsight && brew install rsight" />
             </div>
             <p class="hero-meta">
               macOS · <span class="tag-soon">linux soon</span> ·{" "}
