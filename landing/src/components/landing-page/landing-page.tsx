@@ -44,7 +44,7 @@ const CONTENTS = [
   {
     primary: "~/notes/project-ideas.md:12",
     meta: "md",
-    snippet: "## rsight — find anything in $HOME",
+    snippet: "## rsight — find anything in the current directory",
   },
   {
     primary: "~/src/rsight/src/types.rs:8",
@@ -148,7 +148,7 @@ const InteractiveTerminal = component$(() => {
               selectedIdx.value = 0;
             }}
             onKeyDown$={handleKeyDown}
-            placeholder="search $HOME"
+            placeholder="search current directory"
             autoComplete="off"
             spellcheck={false}
             aria-label="Search query"
@@ -478,7 +478,7 @@ export const LandingPage = component$(() => {
             <h1 class="hero-h1">
               Find anything
               <br />
-              in $HOME.
+              in your directory.
             </h1>
             <p class="hero-sub">
               One TUI. Files, folders, content, and AI conversations searched
@@ -510,7 +510,7 @@ export const LandingPage = component$(() => {
               <div class="feature-key">01</div>
               <div class="feature-title">Files</div>
               <p class="feature-desc">
-                Fuzzy-match file paths across your entire home directory. Opens
+                Fuzzy-match file paths across your current directory. Opens
                 instantly in $EDITOR.
               </p>
               <span class="feature-tag">paths over previews</span>

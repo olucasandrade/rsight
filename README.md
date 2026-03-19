@@ -4,7 +4,7 @@
   <img src="landing/public/logo.png" alt="rsight logo" width="200" />
 </p>
 
-A fast terminal search tool for macOS. Search file names, file contents, and AI conversations from a single interface.
+A fast terminal search tool for macOS. Run `rsight` in any directory to search file names, file contents, and AI conversations from a single interface.
 
 ![Rust](https://img.shields.io/badge/rust-stable-orange)
 ![Platform](https://img.shields.io/badge/platform-macOS-lightgrey)
@@ -12,7 +12,7 @@ A fast terminal search tool for macOS. Search file names, file contents, and AI 
 
 ## Features
 
-- **File & folder search** — fuzzy matching across your home directory
+- **File & folder search** — fuzzy matching across the current directory
 - **Content search** — search inside files with result snippets and line numbers
 - **AI conversation search** — find past conversations from Claude Code and Cursor
 - **Instant results** — parallel search with 150ms debounce; results stream in as you type
@@ -47,7 +47,7 @@ cargo install --git https://github.com/olucasandrade/rsight
 rsight
 ```
 
-Type to search. Results update as you type across all four tabs simultaneously.
+Run from any directory. Results update as you type across all four tabs simultaneously, scoped to the current directory.
 
 ### Keyboard shortcuts
 
@@ -63,9 +63,9 @@ Type to search. Results update as you type across all four tabs simultaneously.
 
 | Tab | Searches | Opens with |
 |-----|----------|-----------|
-| Files | File names under `$HOME` | `$EDITOR` |
-| Folders | Directory names under `$HOME` | Finder |
-| Contents | Text inside files | `$EDITOR` at matching line |
+| Files | File names under current directory | `$EDITOR` |
+| Folders | Directory names under current directory | Finder |
+| Contents | Text inside files under current directory | `$EDITOR` at matching line |
 | AI | Claude Code conversations | `claude --resume` |
 
 ## AI conversation search
