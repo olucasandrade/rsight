@@ -36,21 +36,20 @@ pub async fn run_app(
     terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
     app: &mut AppState,
 ) -> io::Result<()> {
-    let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
+    let home = std::env::current_dir()
+        .map(|p| p.to_string_lossy().into_owned())
+        .unwrap_or_else(|_| ".".to_string());
 
     loop {
-        // 1. Drain any pending search results into AppState (non-blocking)
         loop {
             match app.result_rx.try_recv() {
                 Ok(result) => app.push_result(result),
-                Err(_) => break, // no more results right now
+                Err(_) => break,
             }
         }
 
-        // 2. Render current state
         terminal.draw(|frame| draw_ui(frame, app))?;
 
-        // 3. Poll for keyboard events (non-blocking, 16ms timeout = ~60fps)
         if event::poll(Duration::from_millis(TICK_MS))? {
             if let Event::Key(key) = event::read()? {
                 // Ignore key release events (crossterm sends both press and release on some platforms)
@@ -70,12 +69,10 @@ pub async fn run_app(
 
 async fn handle_key(app: &mut AppState, code: KeyCode, modifiers: KeyModifiers, home: &str) {
     match (code, modifiers) {
-        // Quit
         (KeyCode::Esc, _) => {
             app.should_quit = true;
         }
 
-        // Tab navigation
         (KeyCode::Tab, KeyModifiers::NONE) => {
             cycle_tab(app, NavDir::Forward);
         }
@@ -83,7 +80,6 @@ async fn handle_key(app: &mut AppState, code: KeyCode, modifiers: KeyModifiers, 
             cycle_tab(app, NavDir::Backward);
         }
 
-        // Result navigation
         (KeyCode::Down, _) => {
             let len = app.active_results().len();
             if len > 0 {
@@ -94,7 +90,6 @@ async fn handle_key(app: &mut AppState, code: KeyCode, modifiers: KeyModifiers, 
             app.selected_index = app.selected_index.saturating_sub(1);
         }
 
-        // Text input
         (KeyCode::Char(c), KeyModifiers::NONE) | (KeyCode::Char(c), KeyModifiers::SHIFT) => {
             app.query.push(c);
             // Active tab is intentionally NOT reset here — the user's current tab
@@ -109,14 +104,12 @@ async fn handle_key(app: &mut AppState, code: KeyCode, modifiers: KeyModifiers, 
             if !app.query.is_empty() {
                 trigger_search(app, home).await;
             } else {
-                // Query cleared — abort any running search
                 if let Some(handle) = app.search_handle.take() {
                     handle.abort();
                 }
             }
         }
 
-        // Open selected result
         (KeyCode::Enter, _) => {
             let results = app.active_results();
             if !results.is_empty() {
@@ -133,7 +126,6 @@ async fn handle_key(app: &mut AppState, code: KeyCode, modifiers: KeyModifiers, 
             }
         }
 
-        // Copy path to clipboard
         (KeyCode::Char('c'), KeyModifiers::CONTROL) => {
             let results = app.active_results();
             if !results.is_empty() {
@@ -144,17 +136,14 @@ async fn handle_key(app: &mut AppState, code: KeyCode, modifiers: KeyModifiers, 
             }
         }
 
-        // Ignore everything else
         _ => {}
     }
 }
 
 async fn trigger_search(app: &mut AppState, home: &str) {
-    // Abort the previous debounced search task
     if let Some(handle) = app.search_handle.take() {
         handle.abort();
     }
-    // Start a new debounced search
     let handle = debounced_search(
         home.to_string(),
         app.query.clone(),

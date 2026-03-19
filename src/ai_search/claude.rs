@@ -4,15 +4,25 @@ use std::sync::mpsc;
 use serde_json::Value;
 use crate::types::{SearchResult, AiSource};
 
-/// Walk `~/.claude/projects/` recursively and emit one `AiConversation` result for each
+/// Walk `~/.claude/projects/<encoded-cwd>/` and emit one `AiConversation` result for each
 /// JSONL conversation file whose contents contain the query string (case-insensitive).
+/// The project directory is determined by encoding the current working directory path
+/// (replacing '/' with '-'), matching how Claude Code names its project folders.
 pub fn search_claude_conversations(query: &str, tx: mpsc::Sender<SearchResult>) {
     let home = match std::env::var("HOME") {
         Ok(h) => h,
         Err(_) => return,
     };
-    let projects_dir = format!("{}/.claude/projects", home);
-    let base = Path::new(&projects_dir);
+
+    let cwd = match std::env::current_dir() {
+        Ok(p) => p.to_string_lossy().into_owned(),
+        Err(_) => return,
+    };
+
+    // Claude Code encodes the project path as the directory name by replacing '/' with '-'
+    let encoded = cwd.replace('/', "-");
+    let project_dir = format!("{}/.claude/projects/{}", home, encoded);
+    let base = Path::new(&project_dir);
     if !base.exists() {
         return;
     }
@@ -44,7 +54,6 @@ fn process_jsonl_file(path: &Path, query: &str, tx: &mpsc::Sender<SearchResult>)
 
     let query_lower = query.to_lowercase();
 
-    // Case-insensitive substring match across full file text
     if !content.to_lowercase().contains(&query_lower) {
         return;
     }
@@ -88,7 +97,6 @@ fn process_jsonl_file(path: &Path, query: &str, tx: &mpsc::Sender<SearchResult>)
 
                 // Extract raw text: content may be a plain string or an array of blocks
                 let raw_text: Option<String> = content_val.and_then(|c| {
-                    // Try plain string first
                     if let Some(s) = c.as_str() {
                         return Some(s.to_string());
                     }
@@ -110,7 +118,6 @@ fn process_jsonl_file(path: &Path, query: &str, tx: &mpsc::Sender<SearchResult>)
                     let sanitized = raw.replace('\n', " ").replace('\r', "").replace('\t', " ");
                     let trimmed = sanitized.trim().to_string();
                     if !trimmed.starts_with('<') && !trimmed.is_empty() {
-                        // Extract date from timestamp
                         if let Some(ts) = v.get("timestamp").and_then(|t| t.as_str()) {
                             date = parse_iso_date(ts);
                         }
@@ -145,10 +152,7 @@ fn process_jsonl_file(path: &Path, query: &str, tx: &mpsc::Sender<SearchResult>)
         source: AiSource::ClaudeCode,
     };
 
-    if tx.send(result).is_err() {
-        // Channel closed — stop sending
-        return;
-    }
+    let _ = tx.send(result);
 }
 
 /// Parse an ISO 8601 timestamp like "2026-03-18T18:27:38.841Z" into "Mar 18".

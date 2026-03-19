@@ -18,7 +18,6 @@ pub fn open_result(result: &SearchResult) {
                     .arg(path)
                     .spawn();
             } else {
-                // No $EDITOR set — fall back to system default
                 let _ = Command::new("open").arg(path).spawn();
             }
         }
@@ -34,16 +33,19 @@ pub fn open_result(result: &SearchResult) {
 /// rsight stays alive — uses spawn (non-blocking).
 /// Sets status_message on error (CLI not found).
 pub fn open_conversation(result: &SearchResult, status_message: &mut Option<String>) {
-    if let SearchResult::AiConversation { conversation_id, path, source, .. } = result {
+    if let SearchResult::AiConversation { conversation_id, source, .. } = result {
         match source {
             AiSource::ClaudeCode => {
-                // Check if claude CLI is available
                 let claude_check = Command::new("which").arg("claude").output();
                 if claude_check.map(|o| o.status.success()).unwrap_or(false) {
-                    // Open new Terminal.app window with claude --resume <id>
+                    let project_dir = std::env::current_dir()
+                        .map(|p| p.to_string_lossy().into_owned())
+                        .unwrap_or_else(|_| "~".to_string());
+                    // cd into the project directory before resuming so Claude Code
+                    // opens with the correct workspace context
                     let script = format!(
-                        "tell application \"Terminal\" to do script \"claude --resume {}\"",
-                        conversation_id
+                        "tell application \"Terminal\" to do script \"cd '{}' && claude --resume {}\"",
+                        project_dir, conversation_id
                     );
                     let _ = Command::new("osascript")
                         .arg("-e")
@@ -55,21 +57,7 @@ pub fn open_conversation(result: &SearchResult, status_message: &mut Option<Stri
                     );
                 }
             }
-            AiSource::Cursor => {
-                // Check if cursor CLI is available
-                let cursor_check = Command::new("which").arg("cursor").output();
-                if cursor_check.map(|o| o.status.success()).unwrap_or(false) {
-                    let _ = Command::new("cursor").arg(path).spawn();
-                } else {
-                    // Fall back to opening Cursor.app directly
-                    let app_result = Command::new("open").args(["-a", "Cursor"]).output();
-                    if !app_result.map(|o| o.status.success()).unwrap_or(false) {
-                        *status_message = Some(
-                            "cursor not found — install Cursor from cursor.sh".to_string()
-                        );
-                    }
-                }
-            }
+            // AiSource::Cursor => { ... } // not yet supported
         }
     }
 }
