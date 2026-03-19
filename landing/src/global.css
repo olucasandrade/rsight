@@ -84,14 +84,10 @@ svg {
   letter-spacing: -0.02em;
 }
 
-.nav-logo-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--text);
-  font-size: 12px;
+.nav-logo-img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
 }
 
 .nav-version {

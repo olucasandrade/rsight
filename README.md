@@ -1,5 +1,9 @@
 # rsight
 
+<p align="center">
+  <img src="landing/public/logo.png" alt="rsight logo" width="200" />
+</p>
+
 A fast terminal search tool for macOS. Search file names, file contents, and AI conversations from a single interface.
 
 ![Rust](https://img.shields.io/badge/rust-stable-orange)

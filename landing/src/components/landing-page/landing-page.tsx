@@ -440,7 +440,7 @@ export const LandingPage = component$(() => {
         {/* ── Nav ── */}
         <header class="nav">
           <div class="nav-logo">
-            <span class="nav-logo-icon">rs</span>
+            <img src="/logo.png" alt="rsight logo" class="nav-logo-img" />
             <span>rsight</span>
             <span class="nav-version">v0.1.0</span>
           </div>

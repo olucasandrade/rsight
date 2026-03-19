@@ -1,9 +1,17 @@
 {
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
-  "name": "qwik-project-name",
-  "short_name": "Welcome to Qwik",
+  "name": "rsight",
+  "short_name": "rsight",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#fff",
-  "description": "A Qwik project app."
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "description": "rsight is an open-source TUI written in Rust. Search files, folders, code content, and AI conversations locally in under a second.",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "1200x895",
+      "type": "image/png"
+    }
+  ]
 }
