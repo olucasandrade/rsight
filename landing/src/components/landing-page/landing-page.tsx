@@ -82,7 +82,6 @@ const InteractiveTerminal = component$(() => {
   const query = useSignal("");
   const activeTab = useSignal(0);
   const selectedIdx = useSignal(0);
-  const copied = useSignal(false);
 
   const results = useComputed$(() => {
     const q = query.value.toLowerCase();
