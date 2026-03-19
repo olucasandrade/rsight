@@ -256,7 +256,7 @@ const INSTALL_METHODS = [
     label: "Homebrew",
     recommended: true,
     lines: [
-      { type: "cmd", text: "brew tap olucasandrade/rsight" },
+      { type: "cmd", text: "brew tap olucasandrade/rsight https://github.com/olucasandrade/rsight" },
       { type: "cmd", text: "brew install rsight" },
       { type: "out", text: "==> Downloading rsight-0.1.0.tar.gz" },
       { type: "out", text: "==> Installing rsight" },
@@ -264,7 +264,7 @@ const INSTALL_METHODS = [
       { type: "gap" },
       { type: "cmd", text: "rsight" },
     ],
-    copyText: "brew tap olucasandrade/rsight && brew install rsight",
+    copyText: "brew tap olucasandrade/rsight https://github.com/olucasandrade/rsight && brew install rsight",
     note: "Recommended. No Rust toolchain required.",
   },
   {
@@ -488,7 +488,7 @@ export const LandingPage = component$(() => {
             <div class="hero-install">
               <span class="prompt">$</span>
               <code>brew install rsight</code>
-              <CopyBtn text="brew tap olucasandrade/rsight && brew install rsight" />
+              <CopyBtn text="brew tap olucasandrade/rsight https://github.com/olucasandrade/rsight && brew install rsight" />
             </div>
             <p class="hero-meta">
               macOS · <span class="tag-soon">linux soon</span> ·{" "}

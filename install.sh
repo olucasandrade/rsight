@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-REPO="lucasandrade/rsight"
+REPO="olucasandrade/rsight"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
 
 ARCH=$(uname -m)

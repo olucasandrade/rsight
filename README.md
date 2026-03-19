@@ -19,14 +19,14 @@ A fast terminal search tool for macOS. Search file names, file contents, and AI 
 **Homebrew (recommended)**
 
 ```sh
-brew tap lucasandrade/rsight https://github.com/lucasandrade/rsight
+brew tap olucasandrade/rsight https://github.com/olucasandrade/rsight
 brew install rsight
 ```
 
 **curl**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/lucasandrade/rsight/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/olucasandrade/rsight/main/install.sh | bash
 ```
 
 Installs to `~/.local/bin`. Override with `INSTALL_DIR=/usr/local/bin bash <(curl ...)`.
@@ -34,7 +34,7 @@ Installs to `~/.local/bin`. Override with `INSTALL_DIR=/usr/local/bin bash <(cur
 **From source**
 
 ```sh
-cargo install --git https://github.com/lucasandrade/rsight
+cargo install --git https://github.com/olucasandrade/rsight
 ```
 
 ## Usage
@@ -86,7 +86,7 @@ Benchmarks run on a 500-file corpus (Apple Silicon, optimized build):
 Requires Rust 1.70+.
 
 ```sh
-git clone https://github.com/lucasandrade/rsight
+git clone https://github.com/olucasandrade/rsight
 cd rsight
 cargo build --release
 ./target/release/rsight
