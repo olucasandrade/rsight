@@ -4,7 +4,7 @@
   <img src="landing/public/logo.png" alt="rsight logo" width="200" />
 </p>
 
-A fast terminal search tool for macOS. Run `rsight` in any directory to search file names, file contents, and AI conversations from a single interface.
+A fast terminal search tool for macOS. Run `rsight` to search all files, folders, content, and AI conversations across your entire home directory from a single interface.
 
 ![Rust](https://img.shields.io/badge/rust-stable-orange)
 ![Platform](https://img.shields.io/badge/platform-macOS-lightgrey)
@@ -12,9 +12,9 @@ A fast terminal search tool for macOS. Run `rsight` in any directory to search f
 
 ## Features
 
-- **File & folder search** — fuzzy matching across the current directory
-- **Content search** — search inside files with result snippets and line numbers
-- **AI conversation search** — find past conversations from Claude Code and Cursor
+- **File & folder search** — case-insensitive matching across all of `$HOME`
+- **Content search** — search inside files with result snippets and line numbers, streamed as results arrive
+- **AI conversation search** — find past conversations from Claude Code, Cursor, and Codex
 - **Instant results** — parallel search with 150ms debounce; results stream in as you type
 - **Open from results** — open files in `$EDITOR`, resume AI conversations in their native tool
 
@@ -47,7 +47,7 @@ cargo install --git https://github.com/olucasandrade/rsight
 rsight
 ```
 
-Run from any directory. Results update as you type across all four tabs simultaneously, scoped to the current directory.
+Results update as you type across all four tabs simultaneously, searching your entire home directory.
 
 ### Keyboard shortcuts
 
@@ -63,18 +63,20 @@ Run from any directory. Results update as you type across all four tabs simultan
 
 | Tab | Searches | Opens with |
 |-----|----------|-----------|
-| Files | File names under current directory | `$EDITOR` |
-| Folders | Directory names under current directory | Finder |
-| Contents | Text inside files under current directory | `$EDITOR` at matching line |
-| AI | Claude Code conversations | `claude --resume` |
+| Files | File names across `$HOME` | `$EDITOR` |
+| Folders | Directory names across `$HOME` | Finder |
+| Contents | Text inside files across `$HOME` | `$EDITOR` at matching line |
+| AI | Claude Code, Cursor, and Codex conversations | native tool |
 
 ## AI conversation search
 
 rsight finds conversations from:
 
 - **Claude Code** — reads JSONL sessions from `~/.claude/projects/`
+- **Cursor** — reads conversations from `~/.cursor/chats/`
+- **Codex** — reads JSONL sessions from `~/.codex/sessions/`
 
-Results show the conversation title and date. Press `Enter` to resume the conversation in Claude Code.
+Results show the conversation title and date. Press `Enter` to resume the conversation in its native tool.
 
 ## Performance
 
