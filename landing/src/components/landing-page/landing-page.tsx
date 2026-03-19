@@ -44,7 +44,7 @@ const CONTENTS = [
   {
     primary: "~/notes/project-ideas.md:12",
     meta: "md",
-    snippet: "## rsight — find anything in the current directory",
+    snippet: "## rsight — find anything in the $HOME directory",
   },
   {
     primary: "~/src/rsight/src/types.rs:8",
@@ -149,7 +149,7 @@ const InteractiveTerminal = component$(() => {
               selectedIdx.value = 0;
             }}
             onKeyDown$={handleKeyDown}
-            placeholder="search current directory"
+            placeholder="search $HOME directory"
             autoComplete="off"
             spellcheck={false}
             aria-label="Search query"
@@ -479,7 +479,7 @@ export const LandingPage = component$(() => {
             <h1 class="hero-h1">
               Find anything
               <br />
-              in your directory.
+              $HOME directory.
             </h1>
             <p class="hero-sub">
               One TUI. Files, folders, content, and AI conversations searched
