@@ -5,33 +5,28 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.target }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: macos-13
-            target: x86_64-apple-darwin
-          - os: macos-14
-            target: aarch64-apple-darwin
+    name: Build macOS
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
       - uses: Swatinem/rust-cache@v2
-      - name: Build
-        run: cargo build --release --target ${{ matrix.target }}
+      - name: Build arm64
+        run: cargo build --release --target aarch64-apple-darwin
+      - name: Build x86_64
+        run: cargo build --release --target x86_64-apple-darwin
       - name: Package
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
-          ARCHIVE=rsight-${VERSION}-${{ matrix.target }}.tar.gz
-          tar czf "$ARCHIVE" -C target/${{ matrix.target }}/release rsight
-          echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
+          for TARGET in aarch64-apple-darwin x86_64-apple-darwin; do
+            tar czf "rsight-${VERSION}-${TARGET}.tar.gz" -C "target/${TARGET}/release" rsight
+          done
       - name: Upload
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.ARCHIVE }}
+          files: rsight-*.tar.gz
 
   update-formula:
     name: Update Homebrew formula
@@ -52,20 +47,12 @@ jobs:
       - name: Compute checksums and update formula
         run: |
           VERSION="${GITHUB_REF#refs/tags/v}"
-          ARM64_FILE="rsight-${VERSION}-aarch64-apple-darwin.tar.gz"
-          X86_FILE="rsight-${VERSION}-x86_64-apple-darwin.tar.gz"
+          SHA_ARM64=$(sha256sum "rsight-${VERSION}-aarch64-apple-darwin.tar.gz" | awk '{print $1}')
+          SHA_X86=$(sha256sum "rsight-${VERSION}-x86_64-apple-darwin.tar.gz" | awk '{print $1}')
 
-          SHA_ARM64=$(sha256sum "$ARM64_FILE" | awk '{print $1}')
-          SHA_X86=$(sha256sum "$X86_FILE" | awk '{print $1}')
-
-          # Update version
           sed -i "s|version \".*\"|version \"${VERSION}\"|" Formula/rsight.rb
-
-          # Fill placeholder checksums (first release)
           sed -i "s|<sha256-arm64>|${SHA_ARM64}|" Formula/rsight.rb
           sed -i "s|<sha256-x86_64>|${SHA_X86}|" Formula/rsight.rb
-
-          # Replace existing 64-char hex checksums (re-release)
           sed -i -E "s|sha256 \"[a-f0-9]{64}\" # arm64|sha256 \"${SHA_ARM64}\" # arm64|" Formula/rsight.rb
           sed -i -E "s|sha256 \"[a-f0-9]{64}\" # x86_64|sha256 \"${SHA_X86}\" # x86_64|" Formula/rsight.rb
 
