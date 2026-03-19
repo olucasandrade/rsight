@@ -2,7 +2,8 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum AiSource {
     ClaudeCode,
-    // Cursor, // not yet supported
+    Cursor,
+    Codex,
 }
 
 /// A single search result from any search category.

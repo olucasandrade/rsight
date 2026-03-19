@@ -1,5 +1,3 @@
-use fuzzy_matcher::FuzzyMatcher;
-use fuzzy_matcher::skim::SkimMatcherV2;
 use ignore::WalkBuilder;
 use tokio::sync::mpsc;
 use crate::types::SearchResult;
@@ -7,8 +5,8 @@ use crate::types::SearchResult;
 /// Directories always excluded from traversal regardless of .gitignore rules.
 const EXCLUDED_DIRS: &[&str] = &["node_modules", ".git", "target", "vendor", "build"];
 
-/// Search file and folder names under `root` for entries matching `query` using fuzzy matching.
-/// Results are sent to `tx` as they are found. The function returns when traversal is complete.
+/// Search file and folder names under `root` for entries matching `query` using exact
+/// case-insensitive substring matching. Results are sent to `tx` as they are found.
 ///
 /// # Arguments
 /// - `root`: Absolute path to search root (typically $HOME)
@@ -19,7 +17,7 @@ pub fn search_names(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) {
         return;
     }
 
-    let query_owned = query.to_string();
+    let query_lower = query.to_lowercase();
 
     WalkBuilder::new(root)
         .hidden(false)
@@ -36,8 +34,7 @@ pub fn search_names(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) {
         .build_parallel()
         .run(|| {
             let tx = tx.clone();
-            let matcher = SkimMatcherV2::default();
-            let query = query_owned.clone();
+            let query_lower = query_lower.clone();
             Box::new(move |result| {
                 use ignore::WalkState;
                 let entry = match result {
@@ -54,12 +51,12 @@ pub fn search_names(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) {
                 if name.is_empty() {
                     return WalkState::Continue;
                 }
-                if let Some(score) = matcher.fuzzy_match(&name, &query) {
+                if name.to_lowercase().contains(&query_lower) {
                     let path_str = path.to_string_lossy().into_owned();
                     let result = if entry.file_type().map(|ft| ft.is_dir()).unwrap_or(false) {
-                        SearchResult::Folder { path: path_str, name, score: Some(score) }
+                        SearchResult::Folder { path: path_str, name, score: None }
                     } else {
-                        SearchResult::File { path: path_str, name, score: Some(score) }
+                        SearchResult::File { path: path_str, name, score: None }
                     };
                     // If receiver dropped (cancelled), stop walking
                     if tx.blocking_send(result).is_err() {
@@ -89,11 +86,28 @@ mod tests {
     }
 
     #[test]
-    fn fuzzy_matches_file() {
+    fn exact_matches_file() {
         let dir = TempDir::new().unwrap();
         fs::write(dir.path().join("foobar.txt"), "").unwrap();
-        let results = collect_sync(dir.path().to_str().unwrap(), "fba");
+        let results = collect_sync(dir.path().to_str().unwrap(), "ooba");
         assert!(results.iter().any(|r| matches!(r, SearchResult::File { name, .. } if name == "foobar.txt")));
+    }
+
+    #[test]
+    fn exact_match_is_case_insensitive() {
+        let dir = TempDir::new().unwrap();
+        fs::write(dir.path().join("FooBar.txt"), "").unwrap();
+        let results = collect_sync(dir.path().to_str().unwrap(), "foobar");
+        assert!(results.iter().any(|r| matches!(r, SearchResult::File { name, .. } if name == "FooBar.txt")));
+    }
+
+    #[test]
+    fn fuzzy_pattern_no_longer_matches() {
+        let dir = TempDir::new().unwrap();
+        fs::write(dir.path().join("foobar.txt"), "").unwrap();
+        // "fba" is a fuzzy pattern — should NOT match with exact search
+        let results = collect_sync(dir.path().to_str().unwrap(), "fba");
+        assert!(results.is_empty(), "fuzzy pattern should not match with exact search");
     }
 
     #[test]

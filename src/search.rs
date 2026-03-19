@@ -102,7 +102,7 @@ mod tests {
                 _ => {}
             }
         }
-        // Name "match_me.txt" should fuzzy-match "match"
+        // Name "match_me.txt" contains "match" — should appear as exact match
         assert!(has_file, "expected File result");
         // Content "find this line" does not contain "match" — that's OK,
         // what matters is both search types ran; at minimum File should appear

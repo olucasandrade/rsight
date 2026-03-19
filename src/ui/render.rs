@@ -105,8 +105,8 @@ fn make_list_item(result: &SearchResult, query: &str, max_width: usize) -> ListI
             let prefix = format!("{}:{}  ", path, line_number);
             let snippet = line.trim().to_string();
             let remaining = max_width.saturating_sub(prefix.len());
-            let snippet_truncated = if snippet.len() > remaining {
-                snippet[..remaining].to_string()
+            let snippet_truncated = if snippet.chars().count() > remaining {
+                snippet.chars().take(remaining).collect::<String>()
             } else {
                 snippet
             };
@@ -132,7 +132,8 @@ fn make_list_item(result: &SearchResult, query: &str, max_width: usize) -> ListI
             );
             let source_badge = match source {
                 AiSource::ClaudeCode => Span::styled(" [Claude]", Style::default().fg(Color::DarkGray)),
-                // AiSource::Cursor => Span::styled(" [Cursor]", ...), // not yet supported
+                AiSource::Cursor => Span::styled(" [Cursor]", Style::default().fg(Color::DarkGray)),
+                AiSource::Codex => Span::styled(" [Codex]", Style::default().fg(Color::DarkGray)),
             };
             let mut spans = title_spans;
             spans.push(separator);

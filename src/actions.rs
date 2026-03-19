@@ -29,7 +29,8 @@ pub fn open_result(result: &SearchResult) {
 
 /// Open a conversation in its native application.
 /// For Claude Code: opens a new Terminal.app window running `claude --resume <id>`.
-/// For Cursor: opens Cursor via CLI, or falls back to open -a Cursor.
+/// For Cursor: opens Cursor.app directly (no conversation deep-link available).
+/// For Codex: opens a new Terminal.app window running `codex resume <id>`.
 /// rsight stays alive — uses spawn (non-blocking).
 /// Sets status_message on error (CLI not found).
 pub fn open_conversation(result: &SearchResult, status_message: &mut Option<String>) {
@@ -57,7 +58,29 @@ pub fn open_conversation(result: &SearchResult, status_message: &mut Option<Stri
                     );
                 }
             }
-            // AiSource::Cursor => { ... } // not yet supported
+            AiSource::Cursor => {
+                let _ = Command::new("open").arg("-a").arg("Cursor").spawn();
+            }
+            AiSource::Codex => {
+                let codex_check = Command::new("which").arg("codex").output();
+                if codex_check.map(|o| o.status.success()).unwrap_or(false) {
+                    let project_dir = std::env::current_dir()
+                        .map(|p| p.to_string_lossy().into_owned())
+                        .unwrap_or_else(|_| "~".to_string());
+                    let script = format!(
+                        "tell application \"Terminal\" to do script \"cd '{}' && codex resume {}\"",
+                        project_dir, conversation_id
+                    );
+                    let _ = Command::new("osascript")
+                        .arg("-e")
+                        .arg(&script)
+                        .spawn();
+                } else {
+                    *status_message = Some(
+                        "codex CLI not found — install at github.com/openai/codex".to_string()
+                    );
+                }
+            }
         }
     }
 }

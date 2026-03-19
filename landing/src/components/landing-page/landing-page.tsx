@@ -69,6 +69,7 @@ const AI = [
   { primary: "Search algorithm optimization · Mar 10", meta: "Cursor" },
   { primary: "TUI rendering with ratatui · Mar 8", meta: "Claude Code" },
   { primary: "Async search with tokio · Mar 3", meta: "Cursor" },
+  { primary: "Refactor content search pipeline · Mar 1", meta: "Codex" },
 ];
 
 const TABS = ["Files", "Folders", "Contents", "AI"];
@@ -258,7 +259,7 @@ const INSTALL_METHODS = [
     lines: [
       { type: "cmd", text: "brew tap olucasandrade/rsight https://github.com/olucasandrade/rsight" },
       { type: "cmd", text: "brew install rsight" },
-      { type: "out", text: "==> Downloading rsight-0.1.0.tar.gz" },
+      { type: "out", text: "==> Downloading rsight-0.2.0.tar.gz" },
       { type: "out", text: "==> Installing rsight" },
       { type: "out", text: "==> Installed rsight" },
       { type: "gap" },
@@ -276,7 +277,7 @@ const INSTALL_METHODS = [
         type: "cmd",
         text: "curl -fsSL https://raw.githubusercontent.com/olucasandrade/rsight/main/install.sh | bash",
       },
-      { type: "out", text: "Installing rsight v0.1.0 for arm64..." },
+      { type: "out", text: "Installing rsight v0.2.0 for arm64..." },
       { type: "out", text: "Installed to ~/.local/bin/rsight" },
       { type: "gap" },
       { type: "cmd", text: "rsight" },
@@ -291,7 +292,7 @@ const INSTALL_METHODS = [
     recommended: false,
     lines: [
       { type: "cmd", text: "cargo install rsight" },
-      { type: "out", text: "Compiling rsight v0.1.0 ..." },
+      { type: "out", text: "Compiling rsight v0.2.0 ..." },
       { type: "out", text: "Finished in 18.4s" },
       { type: "out", text: "Installed ~/.cargo/bin/rsight" },
       { type: "gap" },
@@ -309,7 +310,7 @@ const INSTALL_METHODS = [
     lines: [
       { type: "cmd", text: "git clone github.com/olucasandrade/rsight" },
       { type: "cmd", text: "cd rsight && cargo build --release" },
-      { type: "out", text: "Compiling rsight v0.1.0 ..." },
+      { type: "out", text: "Compiling rsight v0.2.0 ..." },
       { type: "out", text: "Finished release [optimized]" },
       { type: "gap" },
       { type: "cmd", text: "./target/release/rsight" },
@@ -442,7 +443,7 @@ export const LandingPage = component$(() => {
           <div class="nav-logo">
             <img src="/logo.png" alt="rsight logo" class="nav-logo-img" />
             <span>rsight</span>
-            <span class="nav-version">v0.1.0</span>
+            <span class="nav-version">v0.2.0</span>
           </div>
           <div class="nav-right">
             <a href="#install" class="nav-link">
@@ -510,8 +511,8 @@ export const LandingPage = component$(() => {
               <div class="feature-key">01</div>
               <div class="feature-title">Files</div>
               <p class="feature-desc">
-                Fuzzy-match file paths across your current directory. Opens
-                instantly in $EDITOR.
+                Case-insensitive file path search across your home directory.
+                Opens instantly in $EDITOR.
               </p>
               <span class="feature-tag">paths over previews</span>
             </div>
@@ -537,8 +538,8 @@ export const LandingPage = component$(() => {
               <div class="feature-key">04</div>
               <div class="feature-title">AI Sessions</div>
               <p class="feature-desc">
-                Resume Claude Code conversations exactly where they left off.
-                Cursor <span class="tag-soon">soon</span>.
+                Resume Claude Code, Cursor, and Codex conversations exactly
+                where they left off.
               </p>
               <span class="feature-tag">context restored</span>
             </div>

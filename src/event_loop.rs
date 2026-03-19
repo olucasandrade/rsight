@@ -36,9 +36,10 @@ pub async fn run_app(
     terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
     app: &mut AppState,
 ) -> io::Result<()> {
-    let home = std::env::current_dir()
-        .map(|p| p.to_string_lossy().into_owned())
-        .unwrap_or_else(|_| ".".to_string());
+    let home = std::env::var("HOME")
+        .unwrap_or_else(|_| std::env::current_dir()
+            .map(|p| p.to_string_lossy().into_owned())
+            .unwrap_or_else(|_| ".".to_string()));
 
     loop {
         loop {

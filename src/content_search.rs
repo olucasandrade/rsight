@@ -1,8 +1,10 @@
 use ignore::WalkBuilder;
 use rayon::prelude::*;
-use std::fs;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
+use std::thread;
 use tokio::sync::mpsc;
 use crate::types::SearchResult;
 
@@ -14,11 +16,11 @@ const EXCLUDED_DIRS: &[&str] = &[
     // macOS system and media directories (large, rarely contain searchable text)
     "Library", "Applications", ".Trash",
     "Movies", "Music", "Pictures",
+    // AI tool data — handled by AI conversation search, not content search
+    ".claude", ".cursor", ".codex",
 ];
 /// Maximum file size to search in bytes (1 MB).
 const MAX_FILE_SIZE: u64 = 1_024 * 1_024;
-/// Number of bytes to inspect for binary detection.
-const BINARY_CHECK_BYTES: usize = 8_192;
 /// Maximum number of content matches to collect before stopping.
 const MAX_CONTENT_RESULTS: usize = 100;
 
@@ -30,78 +32,98 @@ fn is_binary(buf: &[u8]) -> bool {
 /// Search the contents of all text files under `root` for lines containing `query`.
 /// Results are sent to `tx` as matches are found.
 /// Stops after collecting MAX_CONTENT_RESULTS matches.
+///
+/// Memory strategy: paths stream from the walker into rayon via par_bridge() —
+/// no Vec<PathBuf> is collected. Files are read line-by-line via BufReader so only
+/// one 8 KB buffer per rayon thread is live at a time, not a full 1 MB per file.
 pub fn search_contents(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) {
     if query.is_empty() {
         return;
     }
 
-    // Collect file paths using parallel WalkBuilder traversal.
-    // build_parallel() distributes directory traversal across threads, making
-    // the walk itself faster on large trees (e.g. $HOME with many subdirs).
-    let mut file_paths: Vec<std::path::PathBuf> = Vec::new();
-    let (path_tx, path_rx) = std::sync::mpsc::channel();
+    // Walker sends paths as found; rayon consumes them via par_bridge().
+    // No collection into a Vec — paths are processed and discarded as they arrive.
+    let (path_tx, path_rx) = std::sync::mpsc::channel::<std::path::PathBuf>();
 
-    WalkBuilder::new(root)
-        .hidden(false)
-        .git_ignore(false)
-        .max_depth(Some(10))
-        .filter_entry(|e| {
-            if e.file_type().map(|ft| ft.is_dir()).unwrap_or(false) {
-                let name = e.file_name().to_string_lossy();
-                !EXCLUDED_DIRS.contains(&name.as_ref())
-            } else {
-                true
-            }
-        })
-        .build_parallel()
-        .run(|| {
-            let path_tx = path_tx.clone();
-            Box::new(move |entry_result| {
-                use ignore::WalkState;
-                let Ok(entry) = entry_result else { return WalkState::Continue };
-                if entry.file_type().map(|ft| ft.is_file()).unwrap_or(false) {
-                    if let Ok(meta) = entry.metadata() {
-                        if meta.len() <= MAX_FILE_SIZE {
-                            let _ = path_tx.send(entry.into_path());
+    let root_owned = root.to_string();
+    thread::spawn(move || {
+        WalkBuilder::new(&root_owned)
+            .hidden(false)
+            .git_ignore(false)
+            .max_depth(Some(10))
+            .filter_entry(|e| {
+                if e.file_type().map(|ft| ft.is_dir()).unwrap_or(false) {
+                    let name = e.file_name().to_string_lossy();
+                    !EXCLUDED_DIRS.contains(&name.as_ref())
+                } else {
+                    true
+                }
+            })
+            .build_parallel()
+            .run(|| {
+                let path_tx = path_tx.clone();
+                Box::new(move |entry_result| {
+                    use ignore::WalkState;
+                    let Ok(entry) = entry_result else { return WalkState::Continue };
+                    if entry.file_type().map(|ft| ft.is_file()).unwrap_or(false) {
+                        if let Ok(meta) = entry.metadata() {
+                            if meta.len() <= MAX_FILE_SIZE {
+                                if path_tx.send(entry.into_path()).is_err() {
+                                    return WalkState::Quit;
+                                }
+                            }
                         }
                     }
-                }
-                WalkState::Continue
-            })
-        });
-    // Drop the original sender so the receiver closes when all walk threads finish
-    drop(path_tx);
-    while let Ok(p) = path_rx.recv() {
-        file_paths.push(p);
-    }
+                    WalkState::Continue
+                })
+            });
+    });
 
-    // Shared counter for result cap. Checked atomically across rayon threads.
     let match_count = Arc::new(AtomicUsize::new(0));
 
-    file_paths.par_iter().for_each(|path| {
+    // par_bridge() pulls from the channel iterator in parallel without buffering all paths.
+    path_rx.into_iter().par_bridge().for_each(|path| {
         if tx.is_closed() {
             return;
         }
         if match_count.load(Ordering::Relaxed) >= MAX_CONTENT_RESULTS {
             return;
         }
-        let Ok(bytes) = fs::read(path) else { return };
-        let check_len = bytes.len().min(BINARY_CHECK_BYTES);
-        if is_binary(&bytes[..check_len]) {
-            return;
-        }
-        let path_str = path.to_string_lossy().into_owned();
-        for (idx, line) in bytes.split(|&b| b == b'\n').enumerate() {
-            if tx.is_closed() { return; }
-            if match_count.load(Ordering::Relaxed) >= MAX_CONTENT_RESULTS {
+
+        let Ok(file) = File::open(&path) else { return };
+        let mut reader = BufReader::new(file);
+
+        // Peek at the first bytes for binary detection without consuming them.
+        // fill_buf() fills the internal 8 KB buffer and returns a slice;
+        // the bytes remain buffered for the subsequent line reads.
+        {
+            let header = reader.fill_buf().unwrap_or(&[]);
+            if is_binary(header) {
                 return;
             }
-            let Ok(line_str) = std::str::from_utf8(line) else { continue };
-            if line_str.contains(query) {
+        }
+
+        let path_str = path.to_string_lossy().into_owned();
+        let mut line_buf = String::new();
+        let mut line_number: u64 = 0;
+
+        loop {
+            if tx.is_closed() { return; }
+            if match_count.load(Ordering::Relaxed) >= MAX_CONTENT_RESULTS { return; }
+
+            line_buf.clear();
+            match reader.read_line(&mut line_buf) {
+                Ok(0) => break,
+                Ok(_) => {}
+                Err(_) => break,
+            }
+            line_number += 1;
+
+            if line_buf.contains(query) {
                 let result = SearchResult::ContentMatch {
                     path: path_str.clone(),
-                    line_number: (idx + 1) as u64,
-                    line: line_str.trim_end().to_string(),
+                    line_number,
+                    line: line_buf.trim_end().to_string(),
                 };
                 if tx.blocking_send(result).is_ok() {
                     match_count.fetch_add(1, Ordering::Relaxed);
