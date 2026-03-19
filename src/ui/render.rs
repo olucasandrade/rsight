@@ -20,7 +20,6 @@ pub fn draw_ui(frame: &mut Frame, app: &AppState) {
 }
 
 fn draw_search_bar(frame: &mut Frame, app: &AppState, area: ratatui::layout::Rect) {
-    // Show query with a trailing cursor character
     let display = format!("{}_", app.query);
     let paragraph = Paragraph::new(display)
         .block(
@@ -38,7 +37,6 @@ fn draw_tab_bar(frame: &mut Frame, app: &AppState, area: ratatui::layout::Rect) 
             let style = if *tab == app.active_tab {
                 Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)
             } else if !tab.is_enabled() {
-                // AI Conversations: grayed out
                 Style::default().fg(Color::DarkGray)
             } else {
                 Style::default()
@@ -134,7 +132,7 @@ fn make_list_item(result: &SearchResult, query: &str, max_width: usize) -> ListI
             );
             let source_badge = match source {
                 AiSource::ClaudeCode => Span::styled(" [Claude]", Style::default().fg(Color::DarkGray)),
-                AiSource::Cursor => Span::styled(" [Cursor]", Style::default().fg(Color::DarkGray)),
+                // AiSource::Cursor => Span::styled(" [Cursor]", ...), // not yet supported
             };
             let mut spans = title_spans;
             spans.push(separator);

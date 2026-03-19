@@ -2,7 +2,7 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum AiSource {
     ClaudeCode,
-    Cursor,
+    // Cursor, // not yet supported
 }
 
 /// A single search result from any search category.
@@ -35,11 +35,11 @@ pub enum SearchResult {
         /// The full text of the matching line (trimmed to reasonable length).
         line: String,
     },
-    /// An AI conversation (Claude Code JSONL or Cursor SQLite) matching the query.
+    /// An AI conversation matching the query.
     AiConversation {
-        /// Absolute path to the conversation file (JSONL or store.db).
+        /// Absolute path to the conversation file.
         path: String,
-        /// Conversation ID used for resuming (session UUID for Claude, agentId for Cursor).
+        /// Conversation ID used for resuming (session UUID).
         conversation_id: String,
         /// Derived title: first human message truncated to 60 chars, or filename stem.
         title: String,

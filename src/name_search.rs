@@ -22,10 +22,10 @@ pub fn search_names(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) {
     let query_owned = query.to_string();
 
     WalkBuilder::new(root)
-        .hidden(false)          // traverse hidden directories (SRCH-04 requirement)
-        .git_ignore(false)      // do not skip files just because they're gitignored
+        .hidden(false)
+        .git_ignore(false)
+        .max_depth(Some(10))
         .filter_entry(|entry| {
-            // Skip excluded directory names at any depth
             if entry.file_type().map(|ft| ft.is_dir()).unwrap_or(false) {
                 let name = entry.file_name().to_string_lossy();
                 !EXCLUDED_DIRS.contains(&name.as_ref())
@@ -44,7 +44,6 @@ pub fn search_names(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) {
                     Ok(e) => e,
                     Err(_) => return WalkState::Continue,
                 };
-                // Skip the root itself
                 if entry.depth() == 0 {
                     return WalkState::Continue;
                 }

@@ -32,7 +32,6 @@ impl TabKind {
         }
     }
 
-    /// All tabs enabled as of Phase 3.
     pub fn is_enabled(&self) -> bool {
         true
     }
@@ -114,7 +113,6 @@ impl AppState {
             SearchResult::File { .. } => {
                 if self.files.len() < CAP {
                     self.files.push(result);
-                    // Sort by score descending (higher score = better match)
                     self.files.sort_by(|a, b| {
                         let score_a = if let SearchResult::File { score, .. } = a { score.unwrap_or(0) } else { 0 };
                         let score_b = if let SearchResult::File { score, .. } = b { score.unwrap_or(0) } else { 0 };

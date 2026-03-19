@@ -42,8 +42,9 @@ pub fn search_contents(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) 
     let (path_tx, path_rx) = std::sync::mpsc::channel();
 
     WalkBuilder::new(root)
-        .hidden(false)       // include hidden dirs (SRCH-04)
-        .git_ignore(false)   // do not skip gitignored files
+        .hidden(false)
+        .git_ignore(false)
+        .max_depth(Some(10))
         .filter_entry(|e| {
             if e.file_type().map(|ft| ft.is_dir()).unwrap_or(false) {
                 let name = e.file_name().to_string_lossy();
@@ -77,28 +78,24 @@ pub fn search_contents(root: &str, query: &str, tx: mpsc::Sender<SearchResult>) 
     // Shared counter for result cap. Checked atomically across rayon threads.
     let match_count = Arc::new(AtomicUsize::new(0));
 
-    // Parallel content search with rayon
     file_paths.par_iter().for_each(|path| {
         if tx.is_closed() {
-            return; // receiver dropped — cancelled
+            return;
         }
         if match_count.load(Ordering::Relaxed) >= MAX_CONTENT_RESULTS {
-            return; // cap reached
+            return;
         }
         let Ok(bytes) = fs::read(path) else { return };
-        // Binary detection: check first BINARY_CHECK_BYTES
         let check_len = bytes.len().min(BINARY_CHECK_BYTES);
         if is_binary(&bytes[..check_len]) {
             return;
         }
-        // Line-by-line search
         let path_str = path.to_string_lossy().into_owned();
         for (idx, line) in bytes.split(|&b| b == b'\n').enumerate() {
             if tx.is_closed() { return; }
             if match_count.load(Ordering::Relaxed) >= MAX_CONTENT_RESULTS {
-                return; // cap reached mid-file
+                return;
             }
-            // Try to decode as UTF-8; skip lines that aren't valid UTF-8
             let Ok(line_str) = std::str::from_utf8(line) else { continue };
             if line_str.contains(query) {
                 let result = SearchResult::ContentMatch {
@@ -149,9 +146,8 @@ mod tests {
     #[test]
     fn skips_binary_files() {
         let dir = TempDir::new().unwrap();
-        // Write a file with null bytes (binary)
-        let mut data = b"hello world".to_vec();
-        data.push(0u8); // null byte = binary
+            let mut data = b"hello world".to_vec();
+        data.push(0u8);
         fs::write(dir.path().join("binary.bin"), data).unwrap();
         let results = collect_sync(dir.path().to_str().unwrap(), "hello");
         assert!(results.is_empty(), "binary file should be skipped");
@@ -160,13 +156,10 @@ mod tests {
     #[test]
     fn skips_files_over_1mb() {
         let dir = TempDir::new().unwrap();
-        // Create file slightly over 1MB
         let big = vec![b'a'; MAX_FILE_SIZE as usize + 1];
         fs::write(dir.path().join("big.txt"), big).unwrap();
-        // Create small file with same content marker
         fs::write(dir.path().join("small.txt"), "hello world\n").unwrap();
         let results = collect_sync(dir.path().to_str().unwrap(), "hello");
-        // Only small.txt should appear
         assert_eq!(results.len(), 1);
         match &results[0] {
             SearchResult::ContentMatch { path, .. } => {
